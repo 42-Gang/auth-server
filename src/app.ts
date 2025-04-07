@@ -18,5 +18,5 @@ function setErrorHandler(fastify: FastifyInstance) {
 export default async function app(fastify: FastifyInstance) {
   setErrorHandler(fastify);
 
-  fastify.register(routeV1, { prefix: '/v1' });
+  fastify.register(routeV1, { prefix: 'v1' });
 }
