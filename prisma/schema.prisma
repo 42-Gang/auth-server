@@ -7,15 +7,14 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model User {
-  id                   Int      @id @default(autoincrement())
-  name             String   @unique
-  email                String   @unique
-  password_hash        String
-  avatar_url           String?
-  two_factor_enabled   Boolean  @default(false)
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+model JwtToken {
+  id            Int      @id @default(autoincrement())
+  user_id       Int      @map("userId")
+  refresh_token String   @map("refreshToken")
+  expires_at    DateTime @map("expiresAt")
+  created_at    DateTime @default(now()) @map("createdAt")
+  updated_at    DateTime @updatedAt @map("updatedAt")
 
-  @@map("User")
+  @@unique([user_id, refresh_token])
+  @@map("jwt_token")
 }
