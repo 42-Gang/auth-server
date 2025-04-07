@@ -18,3 +18,20 @@ model JwtToken {
   @@unique([user_id, refresh_token])
   @@map("jwt_token")
 }
+
+enum MailVerificationStatus {
+  PENDING
+  VERIFIED
+}
+
+model MailVerification {
+  id         Int                    @id @default(autoincrement())
+  email      String
+  code       String
+  status     MailVerificationStatus @default(PENDING)
+  expires_at DateTime               @map("expiresAt")
+  created_at DateTime               @default(now()) @map("createdAt")
+  updated_at DateTime               @updatedAt @map("updatedAt")
+
+  @@map("mail_verification")
+}
