@@ -32,7 +32,7 @@ export const signupRequestSchema = z.object({
       invalid_type_error: 'Email must be a string',
     })
     .email(),
-  name: z
+  nickname: z
     .string({
       required_error: 'Name is required',
       invalid_type_error: 'Name must be a string',
