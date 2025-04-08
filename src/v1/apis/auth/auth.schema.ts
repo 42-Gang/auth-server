@@ -18,6 +18,12 @@ export const loginRequestSchema = z.object({
 
 // login response schema
 
+export const loginServiceResponseSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  refreshTokenExpiresAt: z.date(),
+});
+
 export const loginResponseSchema = createResponseSchema(
   z.object({
     accessToken: z.string(),

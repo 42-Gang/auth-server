@@ -1,7 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { loginRequestSchema, signupRequestSchema } from './auth.schema.js';
+import { loginRequestSchema, loginResponseSchema, signupRequestSchema } from './auth.schema.js';
 import AuthService from './auth.service.js';
+import { TypeOf } from 'zod';
+import { STATUS } from '../../common/constants/status.js';
 
 export default class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -15,13 +17,16 @@ export default class AuthController {
 
   login = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = loginRequestSchema.parse(request.body);
-    const result = await this.authService.login(body);
-    const refreshToken = await this.authService.generateRefreshToken();
+    const { refreshToken, accessToken, refreshTokenExpiresAt } = await this.authService.login(body);
 
     reply.header(
       'set-cookie',
-      `refreshToken=${refreshToken}; HttpOnly; SameSite=Strict; Secure; Path=/; Max-Age=3600;`,
+      `refreshToken=${refreshToken}; HttpOnly; SameSite=Strict; Secure; Path=/; Expires=${refreshTokenExpiresAt.toUTCString()}`,
     );
-    reply.status(200).send(result);
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Login successful',
+      accessToken,
+    } as TypeOf<typeof loginResponseSchema>);
   };
 }
