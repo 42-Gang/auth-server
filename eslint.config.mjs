@@ -53,6 +53,8 @@ export default tseslint.config(
           caughtErrors: 'none',          // catch(e) 무조건 체크 (e가 미사용이면 에러)
         },
       ],
+
+      '@typescript-eslint/no-empty-object-type': 'off'
     },
 
     // import-plugin 관련 설정
