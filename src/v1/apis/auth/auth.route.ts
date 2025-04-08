@@ -19,6 +19,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       handler: authController.signup,
       options: {
         schema: {
+          description: '회원가입',
           tags: ['auth'],
           body: signupRequestSchema,
           response: {
@@ -33,6 +34,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       handler: authController.login,
       options: {
         schema: {
+          description: '로그인',
           tags: ['auth'],
           body: loginRequestSchema,
           response: {
