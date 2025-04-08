@@ -3,7 +3,6 @@ import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-
 import app from './app.js';
 import { setDiContainer } from './plugins/container.js';
 import { FastifyInstance } from 'fastify';
-import jwtPlugin from './plugins/jwt-plugin.js';
 import { fastifyRedis } from '@fastify/redis';
 import swaggerPlugin from './plugins/swagger/swagger-plugin.js';
 import { Server } from 'socket.io';
