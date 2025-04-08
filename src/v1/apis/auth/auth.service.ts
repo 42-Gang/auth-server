@@ -32,27 +32,12 @@ export default class AuthService {
   async login(
     data: z.infer<typeof loginRequestSchema>,
   ): Promise<z.infer<typeof loginServiceResponseSchema>> {
-    // 유저서버에 메일, 패스워드 인증 요청
-    const authenticateResponse = await this.httpClient.request<{
-      data: {
-        userId: number;
-      };
-    }>({
-      method: 'POST',
-      url: 'http://localhost:8080/api/v1/users/authenticate',
-      body: {
-        email: data.email,
-        password: data.password,
-      },
-    });
-    if (authenticateResponse.statusCode !== 200) {
-      throw new UnAuthorizedException('유효하지 않은 이메일 또는 비밀번호입니다.');
-    }
+    const authResponse = await this.sendAuthRequest(data.email, data.password);
 
-    const userId = authenticateResponse.body.data.userId;
+    const userId = authResponse.body.data.userId;
 
     // refresh token 생성
-    const refreshTokenResult = await this.refreshTokenRepository.create({
+    const createdRefreshToken = await this.refreshTokenRepository.create({
       ...this.tokenGenerator.generateRefreshToken(),
       userId,
     });
@@ -62,8 +47,27 @@ export default class AuthService {
 
     return {
       accessToken,
-      refreshToken: refreshTokenResult.refreshToken,
-      refreshTokenExpiresAt: refreshTokenResult.expiresAt,
+      refreshToken: createdRefreshToken.refreshToken,
+      refreshTokenExpiresAt: createdRefreshToken.expiresAt,
     };
+  }
+
+  private async sendAuthRequest(email: string, password: string) {
+    const authenticateResponse = await this.httpClient.request<{
+      data: {
+        userId: number;
+      };
+    }>({
+      method: 'POST',
+      url: 'http://localhost:8080/api/v1/users/authenticate',
+      body: {
+        email,
+        password,
+      },
+    });
+    if (authenticateResponse.statusCode !== 200) {
+      throw new UnAuthorizedException('유효하지 않은 이메일 또는 비밀번호입니다.');
+    }
+    return authenticateResponse;
   }
 }
