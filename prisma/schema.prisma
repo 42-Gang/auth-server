@@ -7,16 +7,16 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model JwtToken {
-  id            Int      @id @default(autoincrement())
-  user_id       Int      @map("userId")
-  refresh_token String   @map("refreshToken")
-  expires_at    DateTime @map("expiresAt")
-  created_at    DateTime @default(now()) @map("createdAt")
-  updated_at    DateTime @updatedAt @map("updatedAt")
+model RefreshToken {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  refreshToken String   @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  @@unique([user_id, refresh_token])
-  @@map("jwt_token")
+  @@unique([userId, refreshToken])
+  @@map("refresh_token")
 }
 
 enum MailVerificationStatus {
@@ -25,13 +25,13 @@ enum MailVerificationStatus {
 }
 
 model MailVerification {
-  id         Int                    @id @default(autoincrement())
-  email      String
-  code       String
-  status     MailVerificationStatus @default(PENDING)
-  expires_at DateTime               @map("expiresAt")
-  created_at DateTime               @default(now()) @map("createdAt")
-  updated_at DateTime               @updatedAt @map("updatedAt")
+  id        Int                    @id @default(autoincrement())
+  email     String
+  code      String
+  status    MailVerificationStatus @default(PENDING)
+  expiresAt DateTime               @map("expires_at")
+  createdAt DateTime               @default(now()) @map("created_at")
+  updatedAt DateTime               @updatedAt @map("updated_at")
 
   @@map("mail_verification")
 }
