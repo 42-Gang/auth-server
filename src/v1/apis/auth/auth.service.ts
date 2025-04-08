@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { TypeOf } from 'zod';
 
 import {
   loginRequestSchema,
@@ -20,8 +20,8 @@ export default class AuthService {
   ) {}
 
   async signup(
-    data: z.infer<typeof signupRequestSchema>,
-  ): Promise<z.infer<typeof signupResponseSchema>> {
+    data: TypeOf<typeof signupRequestSchema>,
+  ): Promise<TypeOf<typeof signupResponseSchema>> {
     console.log('data', data);
     return {
       status: STATUS.SUCCESS,
@@ -30,8 +30,8 @@ export default class AuthService {
   }
 
   async login(
-    data: z.infer<typeof loginRequestSchema>,
-  ): Promise<z.infer<typeof loginServiceResponseSchema>> {
+    data: TypeOf<typeof loginRequestSchema>,
+  ): Promise<TypeOf<typeof loginServiceResponseSchema>> {
     const authResponse = await this.sendAuthRequest(data.email, data.password);
 
     const userId = authResponse.body.data.userId;
