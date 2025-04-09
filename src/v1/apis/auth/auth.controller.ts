@@ -28,4 +28,9 @@ export default class AuthController {
       accessToken,
     } as TypeOf<typeof loginResponseSchema>);
   };
+
+  requestVerificationCode = async (request: FastifyRequest, reply: FastifyReply) => {
+    const result = await this.authService.requestVerificationCode();
+    reply.status(200).send({ result });
+  };
 }

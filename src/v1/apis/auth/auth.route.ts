@@ -43,6 +43,12 @@ export default async function authRoutes(fastify: FastifyInstance) {
         },
       },
     },
+    {
+      method: 'POST',
+      url: '/mail',
+      handler: authController.requestVerificationCode,
+      options: {},
+    },
   ];
   await addRoutes(fastify, routes);
 }

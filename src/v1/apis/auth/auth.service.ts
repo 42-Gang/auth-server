@@ -62,6 +62,10 @@ export default class AuthService {
     };
   }
 
+  async requestVerificationCode() {
+    return '메일 인증 코드 요청';
+  }
+
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
     const foundMailVerification = await this.mailVerificationRepository.findFirstByEmail(email);
     if (!foundMailVerification) {
