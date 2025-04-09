@@ -9,7 +9,7 @@ import {
 import { STATUS } from '../../common/constants/status.js';
 import { RefreshTokenRepositoryInterface } from '../../storage/database/interfaces/RefreshToken.repository.interface.js';
 import { GotClient } from '../../../plugins/http.client.js';
-import { UnAuthorizedException } from '../../common/exceptions/core.error.js';
+import { HttpException, UnAuthorizedException } from '../../common/exceptions/core.error.js';
 import TokenGenerator from './TokenGenerator.js';
 import { MailVerificationRepositoryInterface } from '../../storage/database/interfaces/MailVerification.repository.interface.js';
 
@@ -29,6 +29,7 @@ export default class AuthService {
       code: data.mailVerificationCode,
       email: data.email,
     });
+
 
     // 유저 생성
     await this.createUser(data);
@@ -84,7 +85,7 @@ export default class AuthService {
       },
     });
     if (userResponse.statusCode !== 201) {
-      throw new UnAuthorizedException('유저 생성에 실패했습니다.');
+      throw new HttpException(userResponse.statusCode, '유저 생성에 실패했습니다.');
     }
   }
 
