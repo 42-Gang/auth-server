@@ -88,6 +88,9 @@ export default class AuthService {
     if (foundMailVerification.expiresAt < new Date()) {
       throw new UnAuthorizedException('메일 인증 코드가 만료되었습니다.');
     }
+    if (3 <= foundMailVerification.tryCount) {
+      throw new UnAuthorizedException('메일 인증 코드가 만료되었습니다.');
+    }
   }
 
   private async createUser(data: TypeOf<typeof signupRequestSchema>) {
