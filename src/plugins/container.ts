@@ -31,6 +31,7 @@ export async function setDiContainer(server: FastifyInstance) {
     jwt: asValue(jwt),
     jwtSecret: asValue(jwtConfig.secret),
     jwtExpiresIn: asValue(jwtConfig.expiresIn),
+    refreshTokenExpiresIn: asValue(process.env.JWT_REFRESH_EXPIRES_IN),
     jwtModule: asClass(JwtModule, {
       injectionMode: 'CLASSIC',
       lifetime: Lifetime.SINGLETON,
