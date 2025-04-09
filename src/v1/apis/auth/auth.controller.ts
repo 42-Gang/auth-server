@@ -10,7 +10,6 @@ export default class AuthController {
 
   signup = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = signupRequestSchema.parse(request.body);
-    request.log.info(body, 'Signup request received');
     const result = await this.authService.signup(body);
     reply.status(201).send(result);
   };

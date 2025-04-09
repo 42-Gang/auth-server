@@ -11,21 +11,31 @@ import { RefreshTokenRepositoryInterface } from '../../storage/database/interfac
 import { GotClient } from '../../../plugins/http.client.js';
 import { UnAuthorizedException } from '../../common/exceptions/core.error.js';
 import TokenGenerator from './TokenGenerator.js';
+import { MailVerificationRepositoryInterface } from '../../storage/database/interfaces/MailVerification.repository.interface.js';
 
 export default class AuthService {
   constructor(
     private readonly refreshTokenRepository: RefreshTokenRepositoryInterface,
     private readonly tokenGenerator: TokenGenerator,
     private readonly httpClient: GotClient,
+    private readonly mailVerificationRepository: MailVerificationRepositoryInterface,
   ) {}
 
   async signup(
     data: TypeOf<typeof signupRequestSchema>,
   ): Promise<TypeOf<typeof signupResponseSchema>> {
-    console.log('data', data);
+    // 메일 인증 코드 확인
+    await this.verifyEmailCode({
+      code: data.mailVerificationCode,
+      email: data.email,
+    });
+
+    // 유저 생성
+    await this.createUser(data);
+
     return {
       status: STATUS.SUCCESS,
-      message: 'User information retrieved successfully',
+      message: '유저를 성공적으로 생성했습니다.',
     };
   }
 
@@ -50,6 +60,32 @@ export default class AuthService {
       refreshToken: createdRefreshToken.refreshToken,
       refreshTokenExpiresAt: createdRefreshToken.expiresAt,
     };
+  }
+
+  private async verifyEmailCode({ code, email }: { code: string; email: string }) {
+    const foundMailVerification = await this.mailVerificationRepository.findFirstByEmail(email);
+    if (!foundMailVerification) {
+      throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
+    }
+    if (foundMailVerification.code !== code) {
+      throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
+    }
+    if (foundMailVerification.expiresAt < new Date()) {
+      throw new UnAuthorizedException('메일 인증 코드가 만료되었습니다.');
+    }
+  }
+
+  private async createUser(data: TypeOf<typeof signupRequestSchema>) {
+    const userResponse = await this.httpClient.request({
+      method: 'POST',
+      url: 'http://localhost:8080/api/v1/users',
+      body: {
+        ...data,
+      },
+    });
+    if (userResponse.statusCode !== 201) {
+      throw new UnAuthorizedException('유저 생성에 실패했습니다.');
+    }
   }
 
   private async sendAuthRequest(email: string, password: string) {

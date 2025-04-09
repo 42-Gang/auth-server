@@ -49,6 +49,7 @@ export const signupRequestSchema = z.object({
     required_error: 'Password is required',
     invalid_type_error: 'Password must be a string',
   }),
+  mailVerificationCode: z.string(),
 });
 
 // signup response schema

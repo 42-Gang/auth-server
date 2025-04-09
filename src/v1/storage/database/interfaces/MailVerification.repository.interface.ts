@@ -6,4 +6,6 @@ export interface MailVerificationRepositoryInterface
     MailVerification,
     Prisma.MailVerificationCreateInput,
     Prisma.MailVerificationUpdateInput
-  > {}
+  > {
+  findFirstByEmail(email: string): Promise<MailVerification | null>;
+}

@@ -23,4 +23,16 @@ export default class MailVerificationRepository implements MailVerificationRepos
   update(id: number, data: Prisma.MailVerificationUpdateInput): Promise<MailVerification> {
     return this.prisma.mailVerification.update({ where: { id }, data });
   }
+
+  findFirstByEmail(email: string): Promise<MailVerification | null> {
+    return this.prisma.mailVerification.findFirst({
+      where: {
+        email,
+        status: 'PENDING',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 }
