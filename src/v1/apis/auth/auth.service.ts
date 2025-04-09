@@ -16,6 +16,7 @@ import {
 } from '../../common/exceptions/core.error.js';
 import TokenGenerator from './TokenGenerator.js';
 import { MailVerificationRepositoryInterface } from '../../storage/database/interfaces/MailVerification.repository.interface.js';
+import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
 
 export default class AuthService {
   constructor(
@@ -75,6 +76,7 @@ export default class AuthService {
     });
 
     // 메일 전송 요청 (kafka)
+    await sendVerificationCodeMail(email, code);
 
     return {
       status: STATUS.SUCCESS,
