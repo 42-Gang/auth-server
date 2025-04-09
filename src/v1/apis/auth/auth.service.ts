@@ -63,6 +63,15 @@ export default class AuthService {
   }
 
   async requestVerificationCode({ email }: { email: string }) {
+    const code = this.generateVerificationCode();
+    await this.mailVerificationRepository.create({
+      email,
+      code,
+      expiresAt: new Date(Date.now() + 60 * 1000),
+    });
+
+    // 메일 전송 요청 (kafka)
+
     return {
       status: STATUS.SUCCESS,
     };
@@ -111,5 +120,14 @@ export default class AuthService {
       throw new UnAuthorizedException('유효하지 않은 이메일 또는 비밀번호입니다.');
     }
     return authenticateResponse;
+  }
+
+  private generateVerificationCode(length: number = 6): string {
+    const digits = '0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += digits[Math.floor(Math.random() * digits.length)];
+    }
+    return result;
   }
 }

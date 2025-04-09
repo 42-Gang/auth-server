@@ -29,6 +29,7 @@ model MailVerification {
   email     String
   code      String
   status    MailVerificationStatus @default(PENDING)
+  tryCount  Int                    @default(0) @map("try_count")
   expiresAt DateTime               @map("expires_at")
   createdAt DateTime               @default(now()) @map("created_at")
   updatedAt DateTime               @updatedAt @map("updated_at")
