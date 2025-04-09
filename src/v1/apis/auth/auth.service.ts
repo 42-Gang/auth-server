@@ -30,7 +30,6 @@ export default class AuthService {
       email: data.email,
     });
 
-
     // 유저 생성
     await this.createUser(data);
 
