@@ -4,6 +4,8 @@ import AuthController from '../../apis/auth/auth.controller.js';
 import {
   loginRequestSchema,
   loginResponseSchema,
+  requestVerificationCodeInputSchema,
+  requestVerificationCodeResponseSchema,
   signupRequestSchema,
   signupResponseSchema,
 } from './auth.schema.js';
@@ -47,7 +49,16 @@ export default async function authRoutes(fastify: FastifyInstance) {
       method: 'POST',
       url: '/mail',
       handler: authController.requestVerificationCode,
-      options: {},
+      options: {
+        schema: {
+          description: '메일 인증 요청',
+          tags: ['auth'],
+          body: requestVerificationCodeInputSchema,
+          response: {
+            200: requestVerificationCodeResponseSchema,
+          },
+        },
+      },
     },
   ];
   await addRoutes(fastify, routes);

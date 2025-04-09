@@ -1,6 +1,11 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { loginRequestSchema, loginResponseSchema, signupRequestSchema } from './auth.schema.js';
+import {
+  loginRequestSchema,
+  loginResponseSchema,
+  requestVerificationCodeInputSchema,
+  signupRequestSchema,
+} from './auth.schema.js';
 import AuthService from './auth.service.js';
 import { TypeOf } from 'zod';
 import { STATUS } from '../../common/constants/status.js';
@@ -30,7 +35,8 @@ export default class AuthController {
   };
 
   requestVerificationCode = async (request: FastifyRequest, reply: FastifyReply) => {
-    const result = await this.authService.requestVerificationCode();
-    reply.status(200).send({ result });
+    const { email } = requestVerificationCodeInputSchema.parse(request.body);
+    const result = await this.authService.requestVerificationCode({ email });
+    reply.status(200).send(result);
   };
 }

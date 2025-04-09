@@ -54,3 +54,16 @@ export const signupRequestSchema = z.object({
 
 // signup response schema
 export const signupResponseSchema = createResponseSchema(z.any());
+
+// mail verification request schema
+export const requestVerificationCodeInputSchema = z.object({
+  email: z
+    .string({
+      required_error: 'Email is required',
+      invalid_type_error: 'Email must be a string',
+    })
+    .email(),
+});
+
+// mail verification response schema
+export const requestVerificationCodeResponseSchema = createResponseSchema(z.undefined());

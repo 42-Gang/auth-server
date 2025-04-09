@@ -62,8 +62,10 @@ export default class AuthService {
     };
   }
 
-  async requestVerificationCode() {
-    return '메일 인증 코드 요청';
+  async requestVerificationCode({ email }: { email: string }) {
+    return {
+      status: STATUS.SUCCESS,
+    };
   }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
