@@ -9,7 +9,8 @@ vi.mock('../../../src/plugins/prisma.js', () => ({
 }));
 
 // ✅ prisma mock instance 생성
-const prisma = (await import('../../../src/plugins/prisma')).default as DeepMockProxy<PrismaClient>;
+const prisma = (await import('../../../src/plugins/prisma.js'))
+  .default as DeepMockProxy<PrismaClient>;
 
 // ✅ 테스트마다 reset
 beforeEach(() => {
