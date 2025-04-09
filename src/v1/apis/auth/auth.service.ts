@@ -90,9 +90,6 @@ export default class AuthService {
       tryCount: foundMailVerification.tryCount + 1,
     });
 
-    if (!foundMailVerification) {
-      throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
-    }
     if (foundMailVerification.code !== code) {
       throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
     }
