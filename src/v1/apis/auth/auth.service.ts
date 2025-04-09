@@ -9,7 +9,11 @@ import {
 import { STATUS } from '../../common/constants/status.js';
 import { RefreshTokenRepositoryInterface } from '../../storage/database/interfaces/RefreshToken.repository.interface.js';
 import { GotClient } from '../../../plugins/http.client.js';
-import { HttpException, UnAuthorizedException } from '../../common/exceptions/core.error.js';
+import {
+  HttpException,
+  NotFoundException,
+  UnAuthorizedException,
+} from '../../common/exceptions/core.error.js';
 import TokenGenerator from './TokenGenerator.js';
 import { MailVerificationRepositoryInterface } from '../../storage/database/interfaces/MailVerification.repository.interface.js';
 
@@ -79,6 +83,13 @@ export default class AuthService {
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
     const foundMailVerification = await this.mailVerificationRepository.findFirstByEmail(email);
+    if (!foundMailVerification) {
+      throw new NotFoundException('인증메일을 전송하지 않았습니다.');
+    }
+    await this.mailVerificationRepository.update(foundMailVerification.id, {
+      tryCount: foundMailVerification.tryCount + 1,
+    });
+
     if (!foundMailVerification) {
       throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
     }

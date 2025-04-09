@@ -8,7 +8,10 @@ import * as jsonwebtoken from 'jsonwebtoken';
 import { GotClient } from '../../../../src/plugins/http.client.js';
 import MailVerificationRepository from '../../../../src/v1/storage/database/prisma/MailVerification.repository.js';
 import { RefreshTokenRepositoryInterface } from 'src/v1/storage/database/interfaces/RefreshToken.repository.interface.js';
-import { UnAuthorizedException } from '../../../../src/v1/common/exceptions/core.error.js';
+import {
+  NotFoundException,
+  UnAuthorizedException,
+} from '../../../../src/v1/common/exceptions/core.error.js';
 import { MailVerificationRepositoryInterface } from '../../../../src/v1/storage/database/interfaces/MailVerification.repository.interface.js';
 import { STATUS } from '../../../../src/v1/common/constants/status.js';
 
@@ -123,6 +126,42 @@ describe('회원가입', () => {
     ).rejects.toThrow(UnAuthorizedException);
   });
 
+  it('회원가입 - 메일 인증코드 실패 3회 실패', async () => {
+    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
+      code: '1234',
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      tryCount: 3,
+    });
+    mockGotClientRequest([{ statusCode: 201, body: {} }]);
+
+    await expect(
+      authService.signup({
+        email: 'test@naver.com',
+        password: '1234',
+        nickname: 'woonshin',
+        mailVerificationCode: '1234',
+      }),
+    ).rejects.toThrow(UnAuthorizedException);
+  });
+
+  it('회원가입 - 메일 인증코드 실패 3회 실패', async () => {
+    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
+      code: '1234',
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+      tryCount: 3,
+    });
+    mockGotClientRequest([{ statusCode: 201, body: {} }]);
+
+    await expect(
+      authService.signup({
+        email: 'test@naver.com',
+        password: '1234',
+        nickname: 'woonshin',
+        mailVerificationCode: '1234',
+      }),
+    ).rejects.toThrow(UnAuthorizedException);
+  });
+
   it('회원가입 - 메일 인증코드 만료', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
@@ -167,6 +206,6 @@ describe('회원가입', () => {
         nickname: 'woonshin',
         mailVerificationCode: '1234',
       }),
-    ).rejects.toThrow(UnAuthorizedException);
+    ).rejects.toThrow(NotFoundException);
   });
 });
