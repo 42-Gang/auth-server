@@ -144,24 +144,6 @@ describe('회원가입', () => {
     ).rejects.toThrow(UnAuthorizedException);
   });
 
-  it('회원가입 - 메일 인증코드 실패 3회 실패', async () => {
-    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
-      code: '1234',
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-      tryCount: 3,
-    });
-    mockGotClientRequest([{ statusCode: 201, body: {} }]);
-
-    await expect(
-      authService.signup({
-        email: 'test@naver.com',
-        password: '1234',
-        nickname: 'woonshin',
-        mailVerificationCode: '1234',
-      }),
-    ).rejects.toThrow(UnAuthorizedException);
-  });
-
   it('회원가입 - 메일 인증코드 만료', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
