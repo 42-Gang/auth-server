@@ -1,11 +1,5 @@
 import { TypeOf } from 'zod';
 
-import {
-  loginRequestSchema,
-  loginServiceResponseSchema,
-  signupRequestSchema,
-  signupResponseSchema,
-} from './auth.schema.js';
 import { STATUS } from '../../common/constants/status.js';
 import { RefreshTokenRepositoryInterface } from '../../storage/database/interfaces/RefreshToken.repository.interface.js';
 import { GotClient } from '../../../plugins/http.client.js';
@@ -17,6 +11,8 @@ import {
 import TokenGenerator from './TokenGenerator.js';
 import { MailVerificationRepositoryInterface } from '../../storage/database/interfaces/MailVerification.repository.interface.js';
 import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
+import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
+import { loginInputSchema, loginServiceResponseSchema } from './schemas/login.schema.js';
 
 export default class AuthService {
   constructor(
@@ -27,7 +23,7 @@ export default class AuthService {
   ) {}
 
   async signup(
-    data: TypeOf<typeof signupRequestSchema>,
+    data: TypeOf<typeof signupInputSchema>,
   ): Promise<TypeOf<typeof signupResponseSchema>> {
     // 메일 인증 코드 확인
     await this.verifyEmailCode({
@@ -45,7 +41,7 @@ export default class AuthService {
   }
 
   async login(
-    data: TypeOf<typeof loginRequestSchema>,
+    data: TypeOf<typeof loginInputSchema>,
   ): Promise<TypeOf<typeof loginServiceResponseSchema>> {
     const authResponse = await this.sendAuthRequest(data.email, data.password);
 
@@ -103,7 +99,7 @@ export default class AuthService {
     }
   }
 
-  private async createUser(data: TypeOf<typeof signupRequestSchema>) {
+  private async createUser(data: TypeOf<typeof signupInputSchema>) {
     const userResponse = await this.httpClient.request({
       method: 'POST',
       url: 'http://localhost:8080/api/v1/users',

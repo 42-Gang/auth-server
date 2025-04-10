@@ -1,15 +1,13 @@
 import { FastifyInstance } from 'fastify';
 
 import AuthController from '../../apis/auth/auth.controller.js';
+import { addRoutes, Route } from '../../../plugins/router.js';
+import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
+import { loginInputSchema, loginResponseSchema } from './schemas/login.schema.js';
 import {
-  loginRequestSchema,
-  loginResponseSchema,
   requestVerificationCodeInputSchema,
   requestVerificationCodeResponseSchema,
-  signupRequestSchema,
-  signupResponseSchema,
-} from './auth.schema.js';
-import { addRoutes, Route } from '../../../plugins/router.js';
+} from './schemas/requestVerificationCode.schema.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
   const authController: AuthController = fastify.diContainer.resolve('authController');
@@ -23,7 +21,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
         schema: {
           description: '회원가입',
           tags: ['auth'],
-          body: signupRequestSchema,
+          body: signupInputSchema,
           response: {
             201: signupResponseSchema,
           },
@@ -38,7 +36,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
         schema: {
           description: '로그인',
           tags: ['auth'],
-          body: loginRequestSchema,
+          body: loginInputSchema,
           response: {
             201: loginResponseSchema,
           },
