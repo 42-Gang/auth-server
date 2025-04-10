@@ -8,4 +8,6 @@ export interface RefreshTokenRepositoryInterface
     Prisma.RefreshTokenUpdateInput
   > {
   findByRefreshToken(refreshToken: string): Promise<RefreshToken | null>;
+
+  findByUserIdWithStatus(userId: number, status: string): Promise<RefreshToken[] | null>;
 }

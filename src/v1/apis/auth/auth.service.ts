@@ -49,6 +49,21 @@ export default class AuthService {
 
     const userId = authResponse.body.data.userId;
 
+    // 기존 refresh token 만료
+    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
+      userId,
+      'ACTIVE',
+    );
+    if (refreshTokens) {
+      await Promise.all(
+        refreshTokens.map((token) =>
+          this.refreshTokenRepository.update(token.id, {
+            status: 'INACTIVE',
+          }),
+        ),
+      );
+    }
+
     // refresh token 생성
     const createdRefreshToken = await this.refreshTokenRepository.create({
       ...this.tokenGenerator.generateRefreshToken(),
