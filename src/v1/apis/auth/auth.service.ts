@@ -13,6 +13,7 @@ import { MailVerificationRepositoryInterface } from '../../storage/database/inte
 import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
 import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginServiceResponseSchema } from './schemas/login.schema.js';
+import { JwtModule } from '../../../plugins/jwt.module.js';
 
 export default class AuthService {
   constructor(
@@ -20,6 +21,7 @@ export default class AuthService {
     private readonly tokenGenerator: TokenGenerator,
     private readonly httpClient: GotClient,
     private readonly mailVerificationRepository: MailVerificationRepositoryInterface,
+    private readonly jwtModule: JwtModule,
   ) {}
 
   async signup(
@@ -77,6 +79,17 @@ export default class AuthService {
     return {
       status: STATUS.SUCCESS,
     };
+  }
+
+  async refreshAccessToken({
+    accessToken,
+    refreshToken,
+  }: {
+    accessToken: string;
+    refreshToken: string;
+  }) {
+    const payload = this.jwtModule.verify(accessToken);
+    console.log(payload);
   }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {

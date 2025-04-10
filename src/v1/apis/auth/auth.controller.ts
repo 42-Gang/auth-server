@@ -27,7 +27,9 @@ export default class AuthController {
     reply.status(200).send({
       status: STATUS.SUCCESS,
       message: 'Login successful',
-      accessToken,
+      data: {
+        accessToken,
+      },
     } as TypeOf<typeof loginResponseSchema>);
   };
 
@@ -35,5 +37,21 @@ export default class AuthController {
     const { email } = requestVerificationCodeInputSchema.parse(request.body);
     const result = await this.authService.requestVerificationCode({ email });
     reply.status(200).send(result);
+  };
+
+  refreshAccessToken = async (request: FastifyRequest, reply: FastifyReply) => {
+    const accessToken = request.headers.authorization;
+
+    request.log.info(request.headers, 'headers');
+    request.log.info(request.cookies.refreshToken, 'refresh token');
+    request.log.info(accessToken, 'access token');
+
+    // const {  } = await this.authService.refreshAccessToken(refreshToken);
+
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Access token refreshed successfully',
+      accessToken,
+    });
   };
 }

@@ -8,6 +8,9 @@ import {
   requestVerificationCodeInputSchema,
   requestVerificationCodeResponseSchema,
 } from './schemas/requestVerificationCode.schema.js';
+import {
+  refreshAccessTokenResponseSchema,
+} from './schemas/refreshAccessToken.schema.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
   const authController: AuthController = fastify.diContainer.resolve('authController');
@@ -54,6 +57,20 @@ export default async function authRoutes(fastify: FastifyInstance) {
           body: requestVerificationCodeInputSchema,
           response: {
             200: requestVerificationCodeResponseSchema,
+          },
+        },
+      },
+    },
+    {
+      method: 'POST',
+      url: '/refresh-token',
+      handler: authController.refreshAccessToken,
+      options: {
+        schema: {
+          description: 'Access token 재발급',
+          tags: ['auth'],
+          response: {
+            200: refreshAccessTokenResponseSchema,
           },
         },
       },
