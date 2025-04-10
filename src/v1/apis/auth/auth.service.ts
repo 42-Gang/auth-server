@@ -50,19 +50,7 @@ export default class AuthService {
     const userId = authResponse.body.data.userId;
 
     // 기존 refresh token 만료
-    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
-      userId,
-      'ACTIVE',
-    );
-    if (refreshTokens) {
-      await Promise.all(
-        refreshTokens.map((token) =>
-          this.refreshTokenRepository.update(token.id, {
-            status: 'INACTIVE',
-          }),
-        ),
-      );
-    }
+    await this.expireAllRefreshTokens(userId);
 
     // refresh token 생성
     const createdRefreshToken = await this.refreshTokenRepository.create({
@@ -78,6 +66,22 @@ export default class AuthService {
       refreshToken: createdRefreshToken.refreshToken,
       refreshTokenExpiresAt: createdRefreshToken.expiresAt,
     };
+  }
+
+  private async expireAllRefreshTokens(userId: number) {
+    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
+      userId,
+      'ACTIVE',
+    );
+    if (refreshTokens) {
+      await Promise.all(
+        refreshTokens.map((token) =>
+          this.refreshTokenRepository.update(token.id, {
+            status: 'INACTIVE',
+          }),
+        ),
+      );
+    }
   }
 
   async requestVerificationCode({
@@ -131,6 +135,8 @@ export default class AuthService {
       },
     };
   }
+
+  async logout() {}
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
     const foundMailVerification = await this.mailVerificationRepository.findFirstByEmail(email);
