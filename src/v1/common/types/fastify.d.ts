@@ -9,8 +9,12 @@ declare module 'fastify' {
   }
 
   interface FastifyRequest {
-    jwt: JWT;
-    authorized: boolean;
-    me: User;
+    headers: {
+      'X-Authenticated': string | undefined | string[];
+      'X-User-Id': string | undefined;
+    };
+
+    authenticated: boolean;
+    userId: number | undefined;
   }
 }
