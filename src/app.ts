@@ -32,18 +32,21 @@ function setMiddleware(fastify: FastifyInstance) {
       request.authenticated = false;
       request.userId = -1;
       done();
+      return;
     }
 
     if (userId === undefined || Array.isArray(userId)) {
       request.authenticated = false;
       request.userId = -1;
       done();
+      return;
     }
 
     if (isNaN(Number(userId))) {
       request.authenticated = false;
       request.userId = -1;
       done();
+      return;
     }
 
     if (authenticated === 'true') {
