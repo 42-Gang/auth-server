@@ -1,8 +1,5 @@
 import 'fastify';
 
-import { User } from '@prisma/client';
-import { JWT } from '@fastify/jwt';
-
 declare module 'fastify' {
   interface FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
@@ -15,6 +12,6 @@ declare module 'fastify' {
     };
 
     authenticated: boolean;
-    userId: number | undefined;
+    userId: number;
   }
 }
