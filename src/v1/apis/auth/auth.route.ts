@@ -8,7 +8,6 @@ import {
   requestVerificationCodeInputSchema,
   requestVerificationCodeResponseSchema,
 } from './schemas/requestVerificationCode.schema.js';
-import { refreshAccessTokenResponseSchema } from './schemas/refreshAccessToken.schema.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
   const authController: AuthController = fastify.diContainer.resolve('authController');
@@ -83,7 +82,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
           description: 'Access token 재발급',
           tags: ['auth'],
           response: {
-            200: refreshAccessTokenResponseSchema,
+            200: loginResponseSchema,
           },
         },
         auth: false, // Access token 재발급은 인증이 필요하지 않음

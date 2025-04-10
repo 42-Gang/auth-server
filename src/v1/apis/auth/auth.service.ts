@@ -14,7 +14,6 @@ import { MailVerificationRepositoryInterface } from '../../storage/database/inte
 import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
 import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginServiceResponseSchema } from './schemas/login.schema.js';
-import { refreshAccessTokenResponseSchema } from './schemas/refreshAccessToken.schema.js';
 import { requestVerificationCodeResponseSchema } from './schemas/requestVerificationCode.schema.js';
 
 export default class AuthService {
@@ -105,7 +104,7 @@ export default class AuthService {
     refreshToken,
   }: {
     refreshToken: string;
-  }): Promise<TypeOf<typeof refreshAccessTokenResponseSchema>> {
+  }): Promise<TypeOf<typeof loginServiceResponseSchema>> {
     const foundRefreshToken = await this.refreshTokenRepository.findByRefreshToken(refreshToken);
     if (!foundRefreshToken) {
       throw new UnAuthorizedException('유효하지 않은 refresh token입니다.');
@@ -125,11 +124,13 @@ export default class AuthService {
       userId: foundRefreshToken.userId,
     });
 
+    // access token 재발급
+    const accessToken = this.tokenGenerator.generateAccessToken(foundRefreshToken.userId);
+
     return {
-      status: STATUS.SUCCESS,
-      data: {
-        refreshToken: newRefreshToken.refreshToken,
-      },
+      accessToken,
+      refreshToken: newRefreshToken.refreshToken,
+      refreshTokenExpiresAt: newRefreshToken.expiresAt,
     };
   }
 

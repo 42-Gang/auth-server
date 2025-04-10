@@ -48,11 +48,23 @@ export default class AuthController {
       throw new UnAuthorizedException('No refresh token');
     }
 
-    const response = await this.authService.refreshAccessToken({
+    const result = await this.authService.refreshAccessToken({
       refreshToken,
     });
 
-    reply.status(200).send(response);
+    reply.setCookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      expires: result.refreshTokenExpiresAt,
+    });
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Access token refreshed successfully',
+      data: {
+        accessToken: result.accessToken,
+      },
+    });
   };
 
   logout = async (request: FastifyRequest, reply: FastifyReply) => {
