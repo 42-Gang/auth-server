@@ -33,15 +33,6 @@ export default class RefreshTokenRepository implements RefreshTokenRepositoryInt
     });
   }
 
-  async findByUserIdWithStatus(userId: number, status: string): Promise<RefreshToken[] | null> {
-    return this.prisma.refreshToken.findMany({
-      where: {
-        userId,
-        status,
-      },
-    });
-  }
-
   async expireAllRefreshTokens(userId: number): Promise<void> {
     await this.prisma.refreshToken.updateMany({
       where: {
