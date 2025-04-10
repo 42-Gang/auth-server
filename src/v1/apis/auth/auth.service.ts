@@ -4,6 +4,7 @@ import { STATUS } from '../../common/constants/status.js';
 import { RefreshTokenRepositoryInterface } from '../../storage/database/interfaces/RefreshToken.repository.interface.js';
 import { GotClient } from '../../../plugins/http.client.js';
 import {
+  ConflictException,
   HttpException,
   NotFoundException,
   UnAuthorizedException,
@@ -73,11 +74,13 @@ export default class AuthService {
   }: {
     email: string;
   }): Promise<TypeOf<typeof requestVerificationCodeResponseSchema>> {
+    await this.validateDuplicatedEmail(email);
+
     const code = this.generateVerificationCode();
     await this.mailVerificationRepository.create({
       email,
       code,
-      expiresAt: new Date(Date.now() + 60 * 1000),
+      expiresAt: new Date(Date.now() + 60 * 1000 * 3),
     });
 
     // 메일 전송 요청 (kafka)
@@ -86,6 +89,16 @@ export default class AuthService {
     return {
       status: STATUS.SUCCESS,
     };
+  }
+
+  private async validateDuplicatedEmail(email: string) {
+    const response = await this.httpClient.request({
+      method: 'GET',
+      url: 'http://localhost:8080/api/v1/users/check-email?email=' + email,
+    });
+    if (response.statusCode !== 200) {
+      throw new ConflictException('중복된 이메일입니다.');
+    }
   }
 
   async refreshAccessToken({

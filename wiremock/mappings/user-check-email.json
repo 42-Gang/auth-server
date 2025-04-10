@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/v1/users/check-email?email=jungslee@naver.com"
+  },
+  "response": {
+    "status": 309
+  }
+}
