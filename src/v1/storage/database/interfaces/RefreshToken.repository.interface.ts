@@ -10,4 +10,6 @@ export interface RefreshTokenRepositoryInterface
   findByRefreshToken(refreshToken: string): Promise<RefreshToken | null>;
 
   findByUserIdWithStatus(userId: number, status: string): Promise<RefreshToken[] | null>;
+
+  expireAllRefreshTokens(userId: number): Promise<void>;
 }

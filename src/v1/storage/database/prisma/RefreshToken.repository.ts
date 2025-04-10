@@ -41,4 +41,16 @@ export default class RefreshTokenRepository implements RefreshTokenRepositoryInt
       },
     });
   }
+
+  async expireAllRefreshTokens(userId: number): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: {
+        userId,
+        status: 'ACTIVE',
+      },
+      data: {
+        status: 'INACTIVE',
+      },
+    });
+  }
 }

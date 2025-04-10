@@ -50,7 +50,7 @@ export default class AuthService {
     const userId = authResponse.body.data.userId;
 
     // 기존 refresh token 만료
-    await this.expireAllRefreshTokens(userId);
+    await this.refreshTokenRepository.expireAllRefreshTokens(userId);
 
     // refresh token 생성
     const createdRefreshToken = await this.refreshTokenRepository.create({
@@ -122,26 +122,10 @@ export default class AuthService {
 
   async logout({ userId }: { userId: number }) {
     // 모든 refresh token 만료
-    await this.expireAllRefreshTokens(userId);
+    await this.refreshTokenRepository.expireAllRefreshTokens(userId);
 
     // 모든 access token 만료
     // redis에 access token 만료시간만큼 블랙리스트로 등록
-  }
-
-  private async expireAllRefreshTokens(userId: number) {
-    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
-      userId,
-      'ACTIVE',
-    );
-    if (refreshTokens) {
-      await Promise.all(
-        refreshTokens.map((token) =>
-          this.refreshTokenRepository.update(token.id, {
-            status: 'INACTIVE',
-          }),
-        ),
-      );
-    }
   }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
