@@ -13,7 +13,8 @@ import { MailVerificationRepositoryInterface } from '../../storage/database/inte
 import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
 import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginServiceResponseSchema } from './schemas/login.schema.js';
-import { JwtModule } from '../../../plugins/jwt.module.js';
+import { refreshAccessTokenResponseSchema } from './schemas/refreshAccessToken.schema.js';
+import { requestVerificationCodeResponseSchema } from './schemas/requestVerificationCode.schema.js';
 
 export default class AuthService {
   constructor(
@@ -21,7 +22,6 @@ export default class AuthService {
     private readonly tokenGenerator: TokenGenerator,
     private readonly httpClient: GotClient,
     private readonly mailVerificationRepository: MailVerificationRepositoryInterface,
-    private readonly jwtModule: JwtModule,
   ) {}
 
   async signup(
@@ -65,7 +65,11 @@ export default class AuthService {
     };
   }
 
-  async requestVerificationCode({ email }: { email: string }) {
+  async requestVerificationCode({
+    email,
+  }: {
+    email: string;
+  }): Promise<TypeOf<typeof requestVerificationCodeResponseSchema>> {
     const code = this.generateVerificationCode();
     await this.mailVerificationRepository.create({
       email,
@@ -82,14 +86,35 @@ export default class AuthService {
   }
 
   async refreshAccessToken({
-    accessToken,
     refreshToken,
   }: {
-    accessToken: string;
     refreshToken: string;
-  }) {
-    const payload = this.jwtModule.verify(accessToken);
-    console.log(payload);
+  }): Promise<TypeOf<typeof refreshAccessTokenResponseSchema>> {
+    const foundRefreshToken = await this.refreshTokenRepository.findByRefreshToken(refreshToken);
+    if (!foundRefreshToken) {
+      throw new UnAuthorizedException('유효하지 않은 refresh token입니다.');
+    }
+    if (foundRefreshToken.expiresAt < new Date()) {
+      throw new UnAuthorizedException('refresh token이 만료되었습니다.');
+    }
+
+    // refresh token 만료
+    await this.refreshTokenRepository.update(foundRefreshToken.id, {
+      status: 'INACTIVE',
+    });
+
+    // refresh token 재발급
+    const newRefreshToken = await this.refreshTokenRepository.create({
+      ...this.tokenGenerator.generateRefreshToken(),
+      userId: foundRefreshToken.userId,
+    });
+
+    return {
+      status: STATUS.SUCCESS,
+      data: {
+        refreshToken: newRefreshToken.refreshToken,
+      },
+    };
   }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {

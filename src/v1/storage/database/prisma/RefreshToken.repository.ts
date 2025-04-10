@@ -23,4 +23,13 @@ export default class RefreshTokenRepository implements RefreshTokenRepositoryInt
   update(id: number, data: Prisma.RefreshTokenUpdateInput): Promise<RefreshToken> {
     return this.prisma.refreshToken.update({ where: { id }, data });
   }
+
+  findByRefreshToken(refreshToken: string): Promise<RefreshToken | null> {
+    return this.prisma.refreshToken.findUnique({
+      where: {
+        refreshToken: refreshToken,
+        status: 'ACTIVE',
+      },
+    });
+  }
 }

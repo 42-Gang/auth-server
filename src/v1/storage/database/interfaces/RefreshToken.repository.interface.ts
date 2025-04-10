@@ -6,4 +6,6 @@ export interface RefreshTokenRepositoryInterface
     RefreshToken,
     Prisma.RefreshTokenCreateInput,
     Prisma.RefreshTokenUpdateInput
-  > {}
+  > {
+  findByRefreshToken(refreshToken: string): Promise<RefreshToken | null>;
+}

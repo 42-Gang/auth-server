@@ -19,4 +19,8 @@ export class JwtModule {
   verify(token: string) {
     return this.jwt.verify(token, this.jwtSecret);
   }
+
+  decode(token: string) {
+    return this.jwt.decode(token);
+  }
 }

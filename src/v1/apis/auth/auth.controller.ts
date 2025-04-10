@@ -6,6 +6,7 @@ import { STATUS } from '../../common/constants/status.js';
 import { signupInputSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginResponseSchema } from './schemas/login.schema.js';
 import { requestVerificationCodeInputSchema } from './schemas/requestVerificationCode.schema.js';
+import { UnAuthorizedException } from '../../common/exceptions/core.error.js';
 
 export default class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -20,10 +21,12 @@ export default class AuthController {
     const body = loginInputSchema.parse(request.body);
     const { refreshToken, accessToken, refreshTokenExpiresAt } = await this.authService.login(body);
 
-    reply.header(
-      'set-cookie',
-      `refreshToken=${refreshToken}; HttpOnly; SameSite=Strict; Secure; Path=/; Expires=${refreshTokenExpiresAt.toUTCString()}`,
-    );
+    reply.setCookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      expires: refreshTokenExpiresAt,
+    });
     reply.status(200).send({
       status: STATUS.SUCCESS,
       message: 'Login successful',
@@ -40,18 +43,15 @@ export default class AuthController {
   };
 
   refreshAccessToken = async (request: FastifyRequest, reply: FastifyReply) => {
-    const accessToken = request.headers.authorization;
+    const refreshToken = request.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new UnAuthorizedException('No refresh token');
+    }
 
-    request.log.info(request.headers, 'headers');
-    request.log.info(request.cookies.refreshToken, 'refresh token');
-    request.log.info(accessToken, 'access token');
-
-    // const {  } = await this.authService.refreshAccessToken(refreshToken);
-
-    reply.status(200).send({
-      status: STATUS.SUCCESS,
-      message: 'Access token refreshed successfully',
-      accessToken,
+    const response = await this.authService.refreshAccessToken({
+      refreshToken,
     });
+
+    reply.status(200).send(response);
   };
 }

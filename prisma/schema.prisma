@@ -7,15 +7,21 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model RefreshToken {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
-  refreshToken String   @map("refresh_token")
-  expiresAt    DateTime @map("expires_at")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+enum RefreshTokenStatus {
+  ACTIVE
+  INACTIVE
+}
 
-  @@unique([userId, refreshToken])
+model RefreshToken {
+  id           Int                @id @default(autoincrement())
+  userId       Int                @map("user_id")
+  refreshToken String             @map("refresh_token")
+  status       RefreshTokenStatus @default(ACTIVE)
+  expiresAt    DateTime           @map("expires_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  @@unique([refreshToken])
   @@map("refresh_token")
 }
 
