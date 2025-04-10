@@ -87,7 +87,9 @@ export default class AuthService {
     await this.mailVerificationRepository.update(foundMailVerification.id, {
       tryCount: foundMailVerification.tryCount + 1,
     });
-
+    if (foundMailVerification.status === 'VERIFIED') {
+      throw new UnAuthorizedException('이미 인증된 이메일입니다.');
+    }
     if (foundMailVerification.code !== code) {
       throw new UnAuthorizedException('메일 인증 코드가 유효하지 않습니다.');
     }
@@ -97,6 +99,10 @@ export default class AuthService {
     if (3 <= foundMailVerification.tryCount) {
       throw new UnAuthorizedException('메일 인증 코드가 만료되었습니다.');
     }
+
+    await this.mailVerificationRepository.update(foundMailVerification.id, {
+      status: 'VERIFIED',
+    });
   }
 
   private async createUser(data: TypeOf<typeof signupInputSchema>) {
