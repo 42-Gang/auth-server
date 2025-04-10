@@ -54,4 +54,13 @@ export default class AuthController {
 
     reply.status(200).send(response);
   };
+
+  logout = async (request: FastifyRequest, reply: FastifyReply) => {
+    await this.authService.logout({ userId: request.userId });
+    reply.clearCookie('refreshToken');
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Logout successful',
+    });
+  };
 }

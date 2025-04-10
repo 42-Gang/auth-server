@@ -68,22 +68,6 @@ export default class AuthService {
     };
   }
 
-  private async expireAllRefreshTokens(userId: number) {
-    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
-      userId,
-      'ACTIVE',
-    );
-    if (refreshTokens) {
-      await Promise.all(
-        refreshTokens.map((token) =>
-          this.refreshTokenRepository.update(token.id, {
-            status: 'INACTIVE',
-          }),
-        ),
-      );
-    }
-  }
-
   async requestVerificationCode({
     email,
   }: {
@@ -136,7 +120,29 @@ export default class AuthService {
     };
   }
 
-  async logout() {}
+  async logout({ userId }: { userId: number }) {
+    // 모든 refresh token 만료
+    await this.expireAllRefreshTokens(userId);
+
+    // 모든 access token 만료
+    // redis에 access token 만료시간만큼 블랙리스트로 등록
+  }
+
+  private async expireAllRefreshTokens(userId: number) {
+    const refreshTokens = await this.refreshTokenRepository.findByUserIdWithStatus(
+      userId,
+      'ACTIVE',
+    );
+    if (refreshTokens) {
+      await Promise.all(
+        refreshTokens.map((token) =>
+          this.refreshTokenRepository.update(token.id, {
+            status: 'INACTIVE',
+          }),
+        ),
+      );
+    }
+  }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {
     const foundMailVerification = await this.mailVerificationRepository.findFirstByEmail(email);

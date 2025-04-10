@@ -47,6 +47,18 @@ export default async function authRoutes(fastify: FastifyInstance) {
       },
     },
     {
+      method: 'GET',
+      url: '/logout',
+      handler: authController.logout,
+      options: {
+        schema: {
+          description: '로그아웃',
+          tags: ['auth'],
+        },
+        auth: true, // 로그아웃은 인증이 필요함
+      },
+    },
+    {
       method: 'POST',
       url: '/mail',
       handler: authController.requestVerificationCode,
