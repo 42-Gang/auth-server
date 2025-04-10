@@ -8,9 +8,7 @@ import {
   requestVerificationCodeInputSchema,
   requestVerificationCodeResponseSchema,
 } from './schemas/requestVerificationCode.schema.js';
-import {
-  refreshAccessTokenResponseSchema,
-} from './schemas/refreshAccessToken.schema.js';
+import { refreshAccessTokenResponseSchema } from './schemas/refreshAccessToken.schema.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
   const authController: AuthController = fastify.diContainer.resolve('authController');
@@ -29,6 +27,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             201: signupResponseSchema,
           },
         },
+        auth: false, // 회원가입은 인증이 필요하지 않음
       },
     },
     {
@@ -44,6 +43,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             201: loginResponseSchema,
           },
         },
+        auth: false, // 로그인은 인증이 필요하지 않음
       },
     },
     {
@@ -59,6 +59,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             200: requestVerificationCodeResponseSchema,
           },
         },
+        auth: false, // 메일 인증 요청은 인증이 필요하지 않음
       },
     },
     {
@@ -73,6 +74,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
             200: refreshAccessTokenResponseSchema,
           },
         },
+        auth: false, // Access token 재발급은 인증이 필요하지 않음
       },
     },
   ];
