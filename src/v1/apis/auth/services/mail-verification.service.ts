@@ -4,13 +4,19 @@ import { NotFoundException, UnAuthorizedException } from '../../../common/except
 import { TypeOf } from 'zod';
 import { requestVerificationCodeResponseSchema } from '../schemas/requestVerificationCode.schema.js';
 import { STATUS } from '../../../common/constants/status.js';
+import UserService from './user.service.js';
 
 export default class MailVerificationService {
-  constructor(private mailVerificationRepository: MailVerificationRepositoryInterface) {}
+  constructor(
+    private readonly mailVerificationRepository: MailVerificationRepositoryInterface,
+    private readonly userService: UserService,
+  ) {}
 
   async requestVerificationCode(
     email: string,
   ): Promise<TypeOf<typeof requestVerificationCodeResponseSchema>> {
+    await this.userService.validateDuplicatedEmail(email);
+
     // 이전 코드 만료
     await this.mailVerificationRepository.expireAllMailVerifications(email);
 
