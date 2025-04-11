@@ -96,7 +96,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       options: {
         schema: {
           description: 'Access token 검증',
-          tags: ['auth'],
+          tags: ['auth - validate token (internal)'],
           response: {
             200: coreResponseSchema,
           },
