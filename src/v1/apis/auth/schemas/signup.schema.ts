@@ -1,5 +1,5 @@
 // signup request schema
-import { createResponseSchema } from '../../../common/schema/core.schema.js';
+import { coreResponseSchema } from '../../../common/schema/core.schema.js';
 import { z } from 'zod';
 
 export const signupInputSchema = z.object({
@@ -24,4 +24,4 @@ export const signupInputSchema = z.object({
 });
 
 // signup response schema
-export const signupResponseSchema = createResponseSchema(z.any());
+export const signupResponseSchema = coreResponseSchema;

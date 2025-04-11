@@ -8,4 +8,6 @@ export interface MailVerificationRepositoryInterface
     Prisma.MailVerificationUpdateInput
   > {
   findFirstByEmail(email: string): Promise<MailVerification | null>;
+
+  expireAllMailVerifications(email: string): Promise<void>;
 }

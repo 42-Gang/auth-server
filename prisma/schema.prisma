@@ -27,6 +27,7 @@ model RefreshToken {
 
 enum MailVerificationStatus {
   PENDING
+  EXPIRED
   VERIFIED
 }
 

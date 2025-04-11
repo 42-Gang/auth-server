@@ -1,0 +1,70 @@
+import { RefreshTokenRepositoryInterface } from '../../../storage/database/interfaces/RefreshToken.repository.interface.js';
+import TokenGenerator from '../TokenGenerator.js';
+import { JwtModule } from '../../../../plugins/jwt.module.js';
+import { UnAuthorizedException } from '../../../common/exceptions/core.error.js';
+
+export default class TokenService {
+  constructor(
+    private refreshTokenRepository: RefreshTokenRepositoryInterface,
+    private tokenGenerator: TokenGenerator,
+    private jwtModule: JwtModule,
+  ) {}
+
+  async generateTokens(userId: number) {
+    const refreshTokenData = await this.refreshTokenRepository.create({
+      ...this.tokenGenerator.generateRefreshToken(),
+      userId,
+    });
+
+    const accessToken = this.tokenGenerator.generateAccessToken(userId);
+
+    return {
+      accessToken,
+      refreshToken: refreshTokenData.refreshToken,
+      refreshTokenExpiresAt: refreshTokenData.expiresAt,
+    };
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    const foundToken = await this.refreshTokenRepository.findByRefreshToken(refreshToken);
+    if (!foundToken || foundToken.expiresAt < new Date()) {
+      throw new UnAuthorizedException('Invalid refresh token.');
+    }
+
+    await this.refreshTokenRepository.update(foundToken.id, { status: 'INACTIVE' });
+    return this.generateTokens(foundToken.userId);
+  }
+
+  async expireRefreshTokens(userId: number) {
+    await this.refreshTokenRepository.expireAllRefreshTokens(userId);
+  }
+
+  verifyAccessToken(accessToken: string): {
+    isValid: boolean;
+    userId?: string;
+  } {
+    try {
+      this.jwtModule.verify(accessToken);
+      const decoded = this.jwtModule.decode(accessToken);
+      if (!decoded) {
+        return {
+          isValid: false,
+        };
+      }
+      if (typeof decoded === 'string') {
+        return {
+          isValid: false,
+        };
+      }
+
+      return {
+        isValid: true,
+        userId: decoded.userId,
+      };
+    } catch (error) {
+      return {
+        isValid: false,
+      };
+    }
+  }
+}

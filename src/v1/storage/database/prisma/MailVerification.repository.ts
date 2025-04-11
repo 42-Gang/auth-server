@@ -35,4 +35,16 @@ export default class MailVerificationRepository implements MailVerificationRepos
       },
     });
   }
+
+  async expireAllMailVerifications(email: string): Promise<void> {
+    await this.prisma.mailVerification.updateMany({
+      where: {
+        email,
+        status: 'PENDING',
+      },
+      data: {
+        status: 'EXPIRED',
+      },
+    });
+  }
 }

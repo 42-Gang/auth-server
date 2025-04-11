@@ -1,15 +1,21 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import AuthService from './auth.service.js';
 import { TypeOf } from 'zod';
 import { STATUS } from '../../common/constants/status.js';
 import { signupInputSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginResponseSchema } from './schemas/login.schema.js';
 import { requestVerificationCodeInputSchema } from './schemas/requestVerificationCode.schema.js';
 import { UnAuthorizedException } from '../../common/exceptions/core.error.js';
+import AuthService from './services/auth.service.js';
+import MailVerificationService from './services/mail-verification.service.js';
+import TokenService from './services/token.service.js';
 
 export default class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailVerificationService: MailVerificationService,
+    private readonly tokenService: TokenService,
+  ) {}
 
   signup = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = signupInputSchema.parse(request.body);
@@ -19,7 +25,10 @@ export default class AuthController {
 
   login = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = loginInputSchema.parse(request.body);
-    const { refreshToken, accessToken, refreshTokenExpiresAt } = await this.authService.login(body);
+    const { refreshToken, accessToken, refreshTokenExpiresAt } = await this.authService.login(
+      body.email,
+      body.password,
+    );
 
     reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -38,7 +47,7 @@ export default class AuthController {
 
   requestVerificationCode = async (request: FastifyRequest, reply: FastifyReply) => {
     const { email } = requestVerificationCodeInputSchema.parse(request.body);
-    const result = await this.authService.requestVerificationCode({ email });
+    const result = await this.mailVerificationService.requestVerificationCode(email);
     reply.status(200).send(result);
   };
 
@@ -48,9 +57,7 @@ export default class AuthController {
       throw new UnAuthorizedException('No refresh token');
     }
 
-    const result = await this.authService.refreshAccessToken({
-      refreshToken,
-    });
+    const result = await this.tokenService.refreshAccessToken(refreshToken);
 
     reply.setCookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -68,7 +75,7 @@ export default class AuthController {
   };
 
   logout = async (request: FastifyRequest, reply: FastifyReply) => {
-    await this.authService.logout({ userId: request.userId });
+    await this.authService.logout(request.userId);
     reply.clearCookie('refreshToken');
     reply.status(200).send({
       status: STATUS.SUCCESS,
