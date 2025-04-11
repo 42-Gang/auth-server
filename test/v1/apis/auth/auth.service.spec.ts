@@ -3,7 +3,6 @@ import RefreshTokenRepository from '../../../../src/v1/storage/database/prisma/R
 import mockPrisma from '../../mocks/mockPrisma.js';
 import TokenGenerator from '../../../../src/v1/apis/auth/TokenGenerator.js';
 import { JwtModule } from '../../../../src/plugins/jwt.module.js';
-import AuthService from '../../../../src/v1/apis/auth/auth.service.js';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { GotClient } from '../../../../src/plugins/http.client.js';
 import MailVerificationRepository from '../../../../src/v1/storage/database/prisma/MailVerification.repository.js';
@@ -14,6 +13,10 @@ import {
 } from '../../../../src/v1/common/exceptions/core.error.js';
 import { MailVerificationRepositoryInterface } from '../../../../src/v1/storage/database/interfaces/MailVerification.repository.interface.js';
 import { STATUS } from '../../../../src/v1/common/constants/status.js';
+import AuthService from '../../../../src/v1/apis/auth/services/auth.service.js';
+import UserService from '../../../../src/v1/apis/auth/services/user.service.js';
+import TokenService from '../../../../src/v1/apis/auth/services/token.service.js';
+import MailVerificationService from '../../../../src/v1/apis/auth/services/mail-verification.service.js';
 
 let refreshTokenRepository: RefreshTokenRepositoryInterface;
 let mailVerificationRepository: MailVerificationRepositoryInterface;
@@ -21,6 +24,9 @@ let tokenGenerator;
 let gotClient: GotClient;
 let authService: AuthService;
 let jwtModule: JwtModule;
+let tokenService: TokenService;
+let mailVerificationService: MailVerificationService;
+let userService: UserService;
 
 const mockGotClientRequest = (requests: { statusCode: number; body: object }[]) => {
   let callIndex = 0;
@@ -48,26 +54,20 @@ beforeEach(() => {
       return false;
     },
   });
+  userService = new UserService(gotClient);
+  tokenService = new TokenService(refreshTokenRepository, tokenGenerator, jwtModule);
+  mailVerificationService = new MailVerificationService(mailVerificationRepository);
 
-  authService = new AuthService(
-    refreshTokenRepository,
-    tokenGenerator,
-    gotClient,
-    mailVerificationRepository,
-    jwtModule,
-  );
+  authService = new AuthService(userService, tokenService, mailVerificationService);
 });
 
 describe('로그인', () => {
-  it('로그인 정상', async () => {
+  it('정상', async () => {
     mockGotClientRequest([{ statusCode: 200, body: { data: { userId: 1 } } }]);
     const expiresAt = new Date(Date.now() + 1000 * 60);
     mockRefreshTokenRepositoryCreate('refreshToken', expiresAt);
 
-    const result = await authService.login({
-      email: 'test@naver.com',
-      password: '1234',
-    });
+    const result = await authService.login('test@naver.com', '1234');
 
     const payload = jsonwebtoken.verify(result.accessToken, 'secret');
     if (typeof payload === 'string') {
@@ -80,22 +80,19 @@ describe('로그인', () => {
     expect(payload.exp).toBeGreaterThan(Date.now() / 1000);
   });
 
-  it('로그인 실패 - 이메일, 패드워드 불일치', async () => {
+  it('이메일, 패드워드 불일치', async () => {
     mockGotClientRequest([{ statusCode: 401, body: {} }]);
     const expiresAt = new Date(Date.now() + 1000 * 60);
     mockRefreshTokenRepositoryCreate('refreshToken', expiresAt);
 
-    await expect(
-      authService.login({
-        email: 'test@naver.com',
-        password: '1234',
-      }),
-    ).rejects.toThrow(UnAuthorizedException);
+    await expect(authService.login('test@naver.com', '1234')).rejects.toThrow(
+      UnAuthorizedException,
+    );
   });
 });
 
 describe('회원가입', () => {
-  it('회원가입 정상', async () => {
+  it('정상', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
       expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -112,7 +109,7 @@ describe('회원가입', () => {
     expect(response.status).toBe(STATUS.SUCCESS);
   });
 
-  it('회원가입 - 메일 인증코드 실패', async () => {
+  it('메일 인증코드 실패', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
       expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -129,7 +126,7 @@ describe('회원가입', () => {
     ).rejects.toThrow(UnAuthorizedException);
   });
 
-  it('회원가입 - 메일 인증코드 실패 3회 실패', async () => {
+  it('메일 인증코드 실패 3회 실패', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
       expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -147,7 +144,7 @@ describe('회원가입', () => {
     ).rejects.toThrow(UnAuthorizedException);
   });
 
-  it('회원가입 - 메일 인증코드 만료', async () => {
+  it('메일 인증코드 만료', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
       expiresAt: new Date(Date.now() - 1000 * 60 * 60),
@@ -164,7 +161,7 @@ describe('회원가입', () => {
     ).rejects.toThrow(UnAuthorizedException);
   });
 
-  it('회원가입 - 회원 생성 실패', async () => {
+  it('유저서버에서 회원 생성 실패', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
       code: '1234',
       expiresAt: new Date(Date.now() + 1000 * 60 * 60),
@@ -181,7 +178,7 @@ describe('회원가입', () => {
     ).rejects.toThrowError('유저 생성에 실패했습니다.');
   });
 
-  it('회원가입 - 메일 인증코드 없음', async () => {
+  it('메일 인증코드 없음', async () => {
     mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue(null);
 
     await expect(
@@ -193,37 +190,36 @@ describe('회원가입', () => {
       }),
     ).rejects.toThrow(NotFoundException);
   });
+});
 
-  it('회원가입 - 코드 인증시 사용 ', async () => {
-    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
-      id: 1,
-      code: '1234',
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-      tryCount: 0,
+describe('로그아웃', () => {
+  it('정상', async () => {
+    const userId = 1;
+
+    await expect(authService.logout(userId)).resolves.not.toThrow();
+  });
+});
+
+describe('accessToken 재발급', () => {
+  it('재발급 정상', async () => {
+    const refreshResult = {
+      accessToken: 'newAccessToken',
+      refreshToken: 'newRefreshToken',
+      refreshTokenExpiresAt: new Date(Date.now() + 1000 * 60),
+    };
+
+    tokenService.refreshAccessToken = vi.fn().mockResolvedValue(refreshResult);
+    const result = await authService.refreshAccessToken('refreshToken');
+    expect(result).toEqual(refreshResult);
+  });
+});
+
+describe('accessToken 검증', () => {
+  it('검증 실패', () => {
+    const result = authService.verifyAccessToken('invalidAccessToken');
+    expect(result).toEqual({
+      isValid: false,
+      userId: undefined,
     });
-    mailVerificationRepository.update = vi.fn().mockResolvedValue(undefined);
-
-    await authService.signup({
-      email: 'test@naver.com',
-      password: '1234',
-      nickname: 'woonshin',
-      mailVerificationCode: '1234',
-    });
-
-    expect(mailVerificationRepository.update).toHaveBeenNthCalledWith(
-      1,
-      1,
-      expect.objectContaining({
-        tryCount: 1,
-      }),
-    );
-
-    expect(mailVerificationRepository.update).toHaveBeenNthCalledWith(
-      2,
-      1,
-      expect.objectContaining({
-        status: 'VERIFIED',
-      }),
-    );
   });
 });

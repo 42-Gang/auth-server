@@ -1,6 +1,6 @@
 import { MailVerificationRepositoryInterface } from '../../../storage/database/interfaces/MailVerification.repository.interface.js';
 import { sendVerificationCodeMail } from '../../../kafka/send.mail.kafka.js';
-import { UnAuthorizedException } from '../../../common/exceptions/core.error.js';
+import { NotFoundException, UnAuthorizedException } from '../../../common/exceptions/core.error.js';
 import { TypeOf } from 'zod';
 import { requestVerificationCodeResponseSchema } from '../schemas/requestVerificationCode.schema.js';
 import { STATUS } from '../../../common/constants/status.js';
@@ -29,7 +29,10 @@ export default class MailVerificationService {
 
   async verifyEmailCode(email: string, code: string) {
     const verification = await this.mailVerificationRepository.findFirstByEmail(email);
-    if (!verification || verification.expiresAt < new Date() || verification.tryCount >= 3) {
+    if (!verification) {
+      throw new NotFoundException('Verification code not found.');
+    }
+    if (verification.expiresAt < new Date() || verification.tryCount >= 3) {
       throw new UnAuthorizedException('Invalid or expired verification code.');
     }
 

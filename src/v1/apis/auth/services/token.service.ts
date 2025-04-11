@@ -43,6 +43,7 @@ export default class TokenService {
     isValid: boolean;
     userId?: string;
   } {
+    // redis의 blacklist 확인하기 -> 해당 id가 blacklist에 있으면 false
     try {
       this.jwtModule.verify(accessToken);
       const decoded = this.jwtModule.decode(accessToken);

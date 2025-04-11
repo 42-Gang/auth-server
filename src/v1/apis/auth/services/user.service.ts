@@ -21,7 +21,7 @@ export default class UserService {
       },
     });
     if (response.statusCode !== 201) {
-      throw new HttpException(response.statusCode, 'User creation failed.');
+      throw new HttpException(response.statusCode, '유저 생성에 실패했습니다.');
     }
   }
 

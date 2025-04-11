@@ -40,6 +40,7 @@ export default class AuthService {
 
   async logout(userId: number) {
     await this.tokenService.expireRefreshTokens(userId);
+    // 해당 아이디의 access token 사용 제한하기 -> redis에 저장
   }
 
   async refreshAccessToken(refreshToken: string) {
