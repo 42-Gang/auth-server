@@ -12,6 +12,8 @@ export default class MailVerificationService {
     private readonly userService: UserService,
   ) {}
 
+  private readonly MAIL_VERIFICATION_CODE_EXPIRSE_IN = 1000 * 60 * 3; // 3분
+
   async requestVerificationCode(
     email: string,
   ): Promise<TypeOf<typeof requestVerificationCodeResponseSchema>> {
@@ -24,7 +26,7 @@ export default class MailVerificationService {
     await this.mailVerificationRepository.create({
       email,
       code,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 3), // 3분 후 만료
+      expiresAt: new Date(Date.now() + this.MAIL_VERIFICATION_CODE_EXPIRSE_IN),
     });
     await sendVerificationCodeMail(email, code);
     return {
