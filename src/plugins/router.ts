@@ -8,7 +8,7 @@ interface RouteOptions extends RouteShorthandOptions {
 }
 
 export interface Route {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | '*';
   url: string;
   handler: RouteHandlerMethod;
   options: RouteOptions;
@@ -16,10 +16,15 @@ export interface Route {
 
 export async function addRoutes(fastify: FastifyInstance, routes: Route[]) {
   routes.forEach((route) => {
+    const method =
+      route.method === '*'
+        ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']
+        : [route.method];
+
     // 권한 필요 없으면 그대로 등록
     if (route.options.auth === false) {
       fastify.route({
-        method: route.method,
+        method,
         url: route.url,
         handler: route.handler,
         schema: route.options.schema,

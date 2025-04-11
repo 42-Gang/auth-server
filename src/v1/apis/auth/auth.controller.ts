@@ -75,4 +75,32 @@ export default class AuthController {
       message: 'Logout successful',
     });
   };
+
+  verifyAccessToken = async (request: FastifyRequest, reply: FastifyReply) => {
+    const authHeader = request.headers.authorization;
+    if (!authHeader) {
+      reply.header('X-Authenticated', 'false');
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('No or invalid Authorization header');
+    }
+    const accessToken = authHeader.split(' ')[1];
+    request.log.info(accessToken, 'accessToken');
+    const result = this.authService.verifyAccessToken(accessToken);
+    request.log.info(result, 'verifyAccessToken result');
+    if (!result.isValid) {
+      reply.header('X-Authenticated', 'false');
+    }
+
+    if (result.isValid) {
+      reply.header('X-Authenticated', 'true');
+      reply.header('X-User-Id', result.userId);
+    }
+
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Access token verified successfully',
+    });
+  };
 }

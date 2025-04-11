@@ -15,6 +15,7 @@ import { sendVerificationCodeMail } from '../../kafka/send.mail.kafka.js';
 import { signupInputSchema, signupResponseSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginServiceResponseSchema } from './schemas/login.schema.js';
 import { requestVerificationCodeResponseSchema } from './schemas/requestVerificationCode.schema.js';
+import { JwtModule } from '../../../plugins/jwt.module.js';
 
 export default class AuthService {
   constructor(
@@ -22,6 +23,7 @@ export default class AuthService {
     private readonly tokenGenerator: TokenGenerator,
     private readonly httpClient: GotClient,
     private readonly mailVerificationRepository: MailVerificationRepositoryInterface,
+    private readonly jwtModule: JwtModule,
   ) {}
 
   async signup(
@@ -140,6 +142,35 @@ export default class AuthService {
 
     // 모든 access token 만료
     // redis에 access token 만료시간만큼 블랙리스트로 등록
+  }
+
+  verifyAccessToken(accessToken: string): {
+    isValid: boolean;
+    userId?: string;
+  } {
+    try {
+      this.jwtModule.verify(accessToken);
+      const decoded = this.jwtModule.decode(accessToken);
+      if (!decoded) {
+        return {
+          isValid: false,
+        };
+      }
+      if (typeof decoded === 'string') {
+        return {
+          isValid: false,
+        };
+      }
+
+      return {
+        isValid: true,
+        userId: decoded.userId,
+      };
+    } catch (error) {
+      return {
+        isValid: false,
+      };
+    }
   }
 
   private async verifyEmailCode({ code, email }: { code: string; email: string }) {

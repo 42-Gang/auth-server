@@ -20,6 +20,7 @@ let mailVerificationRepository: MailVerificationRepositoryInterface;
 let tokenGenerator;
 let gotClient: GotClient;
 let authService: AuthService;
+let jwtModule: JwtModule;
 
 const mockGotClientRequest = (requests: { statusCode: number; body: object }[]) => {
   let callIndex = 0;
@@ -40,7 +41,8 @@ const mockRefreshTokenRepositoryCreate = (refreshToken: string, expiresAt: Date)
 beforeEach(() => {
   refreshTokenRepository = new RefreshTokenRepository(mockPrisma);
   mailVerificationRepository = new MailVerificationRepository(mockPrisma);
-  tokenGenerator = new TokenGenerator(new JwtModule(jsonwebtoken, 'secret', '5m'), 1000 * 60 * 60);
+  jwtModule = new JwtModule(jsonwebtoken, 'secret', '5m');
+  tokenGenerator = new TokenGenerator(jwtModule, 1000 * 60 * 60);
   gotClient = new GotClient({
     get throwHttpErrors(): boolean {
       return false;
@@ -52,6 +54,7 @@ beforeEach(() => {
     tokenGenerator,
     gotClient,
     mailVerificationRepository,
+    jwtModule,
   );
 });
 

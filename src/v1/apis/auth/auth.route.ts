@@ -8,6 +8,7 @@ import {
   requestVerificationCodeInputSchema,
   requestVerificationCodeResponseSchema,
 } from './schemas/requestVerificationCode.schema.js';
+import { coreResponseSchema } from '../../common/schema/core.schema.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
   const authController: AuthController = fastify.diContainer.resolve('authController');
@@ -86,6 +87,21 @@ export default async function authRoutes(fastify: FastifyInstance) {
           },
         },
         auth: false, // Access token 재발급은 인증이 필요하지 않음
+      },
+    },
+    {
+      method: '*',
+      url: '/validate-token',
+      handler: authController.verifyAccessToken,
+      options: {
+        schema: {
+          description: 'Access token 검증',
+          tags: ['auth'],
+          response: {
+            200: coreResponseSchema,
+          },
+        },
+        auth: false,
       },
     },
   ];
