@@ -56,7 +56,7 @@ beforeEach(() => {
   });
   userService = new UserService(gotClient);
   tokenService = new TokenService(refreshTokenRepository, tokenGenerator, jwtModule);
-  mailVerificationService = new MailVerificationService(mailVerificationRepository);
+  mailVerificationService = new MailVerificationService(mailVerificationRepository, userService);
 
   authService = new AuthService(userService, tokenService, mailVerificationService);
 });
