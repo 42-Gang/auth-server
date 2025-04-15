@@ -16,7 +16,6 @@ export async function setDiContainer(server: FastifyInstance) {
   });
   diContainer.register({
     prisma: asValue(prisma),
-    jwt: asValue(jwt),
     logger: asValue(server.log),
     redisClient: asValue(server.redis),
     httpClient: asValue(
