@@ -23,5 +23,9 @@ export const signupInputSchema = z.object({
   mailVerificationCode: z.string(),
 });
 
+export const createUserInputSchema = signupInputSchema.omit({
+  mailVerificationCode: true,
+});
+
 // signup response schema
 export const signupResponseSchema = coreResponseSchema;

@@ -5,12 +5,12 @@ import {
   UnAuthorizedException,
 } from '../../../common/exceptions/core.error.js';
 import { TypeOf } from 'zod';
-import { signupInputSchema } from '../schemas/signup.schema.js';
+import { createUserInputSchema } from '../schemas/signup.schema.js';
 
 export default class UserService {
   constructor(private httpClient: GotClient) {}
 
-  async createUser(userData: TypeOf<typeof signupInputSchema>) {
+  async createUser(userData: TypeOf<typeof createUserInputSchema>) {
     const response = await this.httpClient.request({
       method: 'POST',
       url: 'http://localhost:8080/api/v1/users',

@@ -29,7 +29,6 @@ export default class AuthService {
       email,
       password,
       nickname,
-      mailVerificationCode,
     });
 
     return {
