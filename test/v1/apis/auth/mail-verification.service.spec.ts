@@ -6,6 +6,7 @@ import UserService from '../../../../src/v1/apis/auth/services/user.service.js';
 import { STATUS } from '../../../../src/v1/common/constants/status.js';
 import {
   NotFoundException,
+  TooManyRequestsException,
   UnAuthorizedException,
 } from '../../../../src/v1/common/exceptions/core.error.js';
 import { GotClient } from '../../../../src/plugins/http.client.js';
@@ -46,6 +47,16 @@ describe('이메일 인증 요청', () => {
     expect(result.status).toBe(STATUS.SUCCESS);
     expect(result.message).toBe('Verification code sent successfully.');
     expect(sendVerificationCodeMail).toHaveBeenCalled();
+  });
+
+  it('이미 인증 메일 발송', async () => {
+    userService.validateDuplicatedEmail = vi.fn().mockResolvedValue(undefined);
+    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
+      expiresAt: new Date(Date.now() + 1000 * 60),
+    });
+    await expect(mailVerificationService.requestVerificationCode('test@naver.com')).rejects.toThrow(
+      TooManyRequestsException,
+    );
   });
 });
 

@@ -1,6 +1,10 @@
 import { MailVerificationRepositoryInterface } from '../../../storage/database/interfaces/MailVerification.repository.interface.js';
 import { sendVerificationCodeMail } from '../../../kafka/send.mail.kafka.js';
-import { NotFoundException, UnAuthorizedException } from '../../../common/exceptions/core.error.js';
+import {
+  NotFoundException,
+  TooManyRequestsException,
+  UnAuthorizedException,
+} from '../../../common/exceptions/core.error.js';
 import { TypeOf } from 'zod';
 import { requestVerificationCodeResponseSchema } from '../schemas/requestVerificationCode.schema.js';
 import { STATUS } from '../../../common/constants/status.js';
@@ -18,6 +22,15 @@ export default class MailVerificationService {
     email: string,
   ): Promise<TypeOf<typeof requestVerificationCodeResponseSchema>> {
     await this.userService.validateDuplicatedEmail(email);
+
+    const lastVerification = await this.mailVerificationRepository.findFirstByEmail(email);
+    if (lastVerification) {
+      if (new Date() < lastVerification.expiresAt) {
+        throw new TooManyRequestsException(
+          '이미 인증 메일을 보냈습니다. 3분 뒤에 다시 시도해주세요.',
+        );
+      }
+    }
 
     // 이전 코드 만료
     await this.mailVerificationRepository.expireAllMailVerifications(email);
