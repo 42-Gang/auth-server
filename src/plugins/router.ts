@@ -8,7 +8,7 @@ interface RouteOptions extends RouteShorthandOptions {
 }
 
 export interface Route {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | '*';
   url: string;
   handler: RouteHandlerMethod;
   options: RouteOptions;
@@ -16,23 +16,28 @@ export interface Route {
 
 export async function addRoutes(fastify: FastifyInstance, routes: Route[]) {
   routes.forEach((route) => {
-    if (route.options.auth) {
-      // 권한이 필요한 API라면 인증 훅을 자동으로 추가
+    const method =
+      route.method === '*'
+        ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']
+        : [route.method];
+
+    // 권한 필요 없으면 그대로 등록
+    if (route.options.auth === false) {
       fastify.route({
-        method: route.method,
-        url: route.url,
-        handler: route.handler,
-        schema: route.options.schema,
-        preHandler: fastify.authenticate, // ✅ 권한 확인 미들웨어
-      });
-    } else {
-      // 권한 필요 없으면 그대로 등록
-      fastify.route({
-        method: route.method,
+        method,
         url: route.url,
         handler: route.handler,
         schema: route.options.schema,
       });
+      return;
     }
+
+    fastify.route({
+      method: route.method,
+      url: route.url,
+      handler: route.handler,
+      schema: route.options.schema,
+      preHandler: fastify.authenticate, // ✅ 권한 확인 미들웨어
+    });
   });
 }

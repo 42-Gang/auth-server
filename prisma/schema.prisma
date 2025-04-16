@@ -7,15 +7,39 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model User {
-  id                   Int      @id @default(autoincrement())
-  name             String   @unique
-  email                String   @unique
-  password_hash        String
-  avatar_url           String?
-  two_factor_enabled   Boolean  @default(false)
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+enum RefreshTokenStatus {
+  ACTIVE
+  INACTIVE
+}
 
-  @@map("User")
+model RefreshToken {
+  id           Int                @id @default(autoincrement())
+  userId       Int                @map("user_id")
+  refreshToken String             @map("refresh_token")
+  status       RefreshTokenStatus @default(ACTIVE)
+  expiresAt    DateTime           @map("expires_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  @@unique([refreshToken])
+  @@map("refresh_token")
+}
+
+enum MailVerificationStatus {
+  PENDING
+  EXPIRED
+  VERIFIED
+}
+
+model MailVerification {
+  id        Int                    @id @default(autoincrement())
+  email     String
+  code      String
+  status    MailVerificationStatus @default(PENDING)
+  tryCount  Int                    @default(0) @map("try_count")
+  expiresAt DateTime               @map("expires_at")
+  createdAt DateTime               @default(now()) @map("created_at")
+  updatedAt DateTime               @updatedAt @map("updated_at")
+
+  @@map("mail_verification")
 }

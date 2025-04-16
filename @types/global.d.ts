@@ -20,8 +20,10 @@ declare global {
       REDIS_PORT: string;
 
       JWT_SECRET: string;
-      JWT_EXPIRES_IN: string;
-      JWT_REFRESH_EXPIRES_IN: string;
+      JWT_EXPIRES_IN_MINUTES: string;
+      JWT_REFRESH_EXPIRES_IN_MINUTES: string;
+
+      KAFKA_BROKER: string;
     }
   }
 }

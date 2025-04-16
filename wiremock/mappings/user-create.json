@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/v1/users"
+  },
+  "response": {
+    "status": 201
+  }
+}

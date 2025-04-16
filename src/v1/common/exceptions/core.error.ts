@@ -49,3 +49,9 @@ export class NotImplementedException extends HttpException {
     super(501, message || 'Not Implemented');
   }
 }
+
+export class TooManyRequestsException extends HttpException {
+  constructor(message: string) {
+    super(429, message || 'Too Many Requests');
+  }
+}

@@ -3,6 +3,14 @@ import { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fas
 import routeV1 from './v1/index.js';
 import { STATUS } from './v1/common/constants/status.js';
 
+export default async function app(fastify: FastifyInstance) {
+  setErrorHandler(fastify);
+  setDecorate(fastify);
+  setMiddleware(fastify);
+
+  fastify.register(routeV1, { prefix: 'v1' });
+}
+
 function setErrorHandler(fastify: FastifyInstance) {
   fastify.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
     fastify.log.error(error);
@@ -15,8 +23,48 @@ function setErrorHandler(fastify: FastifyInstance) {
   });
 }
 
-export default async function app(fastify: FastifyInstance) {
-  setErrorHandler(fastify);
+function setMiddleware(fastify: FastifyInstance) {
+  fastify.addHook('onRequest', (request, reply, done) => {
+    const authenticated = request.headers['x-authenticated'];
+    const userId = request.headers['x-user-id'];
 
-  fastify.register(routeV1, { prefix: '/v1' });
+    if (authenticated === undefined || Array.isArray(authenticated)) {
+      request.authenticated = false;
+      request.userId = -1;
+      done();
+      return;
+    }
+
+    if (userId === undefined || Array.isArray(userId)) {
+      request.authenticated = false;
+      request.userId = -1;
+      done();
+      return;
+    }
+
+    if (isNaN(Number(userId))) {
+      request.authenticated = false;
+      request.userId = -1;
+      done();
+      return;
+    }
+
+    if (authenticated === 'true') {
+      request.authenticated = true;
+      request.userId = parseInt(userId as string, 10);
+    }
+    done();
+  });
+}
+
+function setDecorate(fastify: FastifyInstance) {
+  fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+    console.log(request.authenticated);
+    if (!request.authenticated) {
+      reply.code(401).send({
+        status: STATUS.ERROR,
+        message: 'Unauthorized',
+      });
+    }
+  });
 }
