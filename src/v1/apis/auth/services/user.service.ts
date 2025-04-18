@@ -6,6 +6,7 @@ import {
 } from '../../../common/exceptions/core.error.js';
 import { TypeOf } from 'zod';
 import { createUserInputSchema } from '../schemas/signup.schema.js';
+import process from 'node:process';
 
 export default class UserService {
   constructor(private httpClient: GotClient) {}
@@ -13,7 +14,7 @@ export default class UserService {
   async createUser(userData: TypeOf<typeof createUserInputSchema>) {
     const response = await this.httpClient.request({
       method: 'POST',
-      url: 'http://localhost:8080/api/v1/users',
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users`,
       body: {
         email: userData.email,
         password: userData.password,
@@ -28,19 +29,23 @@ export default class UserService {
   async authenticateUser(email: string, password: string): Promise<number> {
     const response = await this.httpClient.request<{ data: { userId: number } }>({
       method: 'POST',
-      url: 'http://localhost:8080/api/v1/users/authenticate',
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/authenticate`,
+      headers: {
+        'X-Internal': 'true',
+      },
       body: { email, password },
     });
     if (response.statusCode !== 200) {
       throw new UnAuthorizedException('Invalid credentials.');
     }
+    console.log(response);
     return response.body.data.userId;
   }
 
   async validateDuplicatedEmail(email: string) {
     const response = await this.httpClient.request({
       method: 'GET',
-      url: `http://localhost:8080/api/v1/users/check-email?email=${email}`,
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/check-email?email=${email}`,
     });
     if (response.statusCode !== 200) {
       throw new ConflictException('Email already exists.');

@@ -104,6 +104,14 @@ export default async function authRoutes(fastify: FastifyInstance) {
         auth: false,
       },
     },
+    {
+      method: 'GET',
+      url: '/health-check',
+      handler: () => 'hello world',
+      options: {
+        auth: false,
+      },
+    },
   ];
   await addRoutes(fastify, routes);
 }

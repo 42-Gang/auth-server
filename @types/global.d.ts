@@ -24,6 +24,8 @@ declare global {
       JWT_REFRESH_EXPIRES_IN_MINUTES: string;
 
       KAFKA_BROKER: string;
+
+
     }
   }
 }
