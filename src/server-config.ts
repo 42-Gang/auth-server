@@ -8,6 +8,7 @@ import swaggerPlugin from './plugins/swagger/swagger-plugin.js';
 import { Server } from 'socket.io';
 import { connectKafkaProducer } from './plugins/kafka.js';
 import { fastifyCookie } from '@fastify/cookie';
+import { fastifyCors } from '@fastify/cors';
 
 export async function configureServer(server: FastifyInstance) {
   server.setValidatorCompiler(validatorCompiler); // Fastify 유효성 검사기 설정
@@ -16,6 +17,12 @@ export async function configureServer(server: FastifyInstance) {
 }
 
 export async function registerPlugins(server: FastifyInstance) {
+  server.register(fastifyCors, {
+    origin: '*', // 모든 출처 허용
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // 허용할 HTTP 메서드
+    allowedHeaders: ['Content-Type', 'Authorization'], // 허용할 헤더
+    credentials: true, // 쿠키 전송 허용
+  });
   await server.register(fastifyCookie);
   await registerRedisPlugin(server); // Redis 플러그인 등록
   await setDiContainer(server); // 의존성 주입 컨테이너 설정

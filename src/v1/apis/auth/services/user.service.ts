@@ -15,6 +15,9 @@ export default class UserService {
     const response = await this.httpClient.request({
       method: 'POST',
       url: `http://${process.env.USER_SERVER_URL}/api/v1/users`,
+      headers: {
+        'X-Internal': 'true',
+      },
       body: {
         email: userData.email,
         password: userData.password,
@@ -45,7 +48,10 @@ export default class UserService {
   async validateDuplicatedEmail(email: string) {
     const response = await this.httpClient.request({
       method: 'GET',
-      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/check-email?email=${email}`,
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/check-email/${email}`,
+      headers: {
+        'X-Internal': 'true',
+      },
     });
     if (response.statusCode !== 200) {
       throw new ConflictException('Email already exists.');
