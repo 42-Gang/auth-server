@@ -33,7 +33,7 @@ export default class AuthController {
     reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       expires: refreshTokenExpiresAt,
     });
     reply.status(200).send({
@@ -87,24 +87,27 @@ export default class AuthController {
     const authHeader = request.headers.authorization;
     if (!authHeader) {
       reply.header('X-Authenticated', 'false');
+      return reply.status(200).send();
+    }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      reply.header('X-Authenticated', 'false');
+      return reply.status(200).send();
     }
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new Error('No or invalid Authorization header');
+    if (authHeader.split(' ').length !== 2) {
+      reply.header('X-Authenticated', 'false');
+      return reply.status(200).send();
     }
+
     const accessToken = authHeader.split(' ')[1];
-    request.log.info(accessToken, 'accessToken');
     const result = this.authService.verifyAccessToken(accessToken);
-    request.log.info(result, 'verifyAccessToken result');
     if (!result.isValid) {
       reply.header('X-Authenticated', 'false');
+      return reply.status(200).send();
     }
 
-    if (result.isValid) {
-      reply.header('X-Authenticated', 'true');
-      reply.header('X-User-Id', result.userId);
-    }
-
+    reply.header('X-Authenticated', 'true');
+    reply.header('X-User-Id', result.userId);
     reply.status(200).send({
       status: STATUS.SUCCESS,
       message: 'Access token verified successfully',
