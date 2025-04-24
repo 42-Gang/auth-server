@@ -12,7 +12,9 @@ export default class UserService {
   constructor(private httpClient: GotClient) {}
 
   async createUser(userData: TypeOf<typeof createUserInputSchema>) {
-    const response = await this.httpClient.request({
+    const response = await this.httpClient.request<{
+      message: string;
+    }>({
       method: 'POST',
       url: `http://${process.env.USER_SERVER_URL}/api/v1/users`,
       headers: {
@@ -25,7 +27,7 @@ export default class UserService {
       },
     });
     if (response.statusCode !== 201) {
-      throw new HttpException(response.statusCode, '유저 생성에 실패했습니다.');
+      throw new HttpException(response.statusCode, response.body.message);
     }
   }
 
@@ -41,7 +43,6 @@ export default class UserService {
     if (response.statusCode !== 200) {
       throw new UnAuthorizedException('Invalid credentials.');
     }
-    console.log(response);
     return response.body.data.userId;
   }
 
