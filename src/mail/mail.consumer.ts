@@ -3,7 +3,7 @@ import { kafka } from '../plugins/kafka.js';
 
 const consumer = kafka.consumer({ groupId: GROUP_IDS, sessionTimeout: 10000 });
 
-export async function startConsumer() {
+export async function startMailConsumer() {
   await consumer.connect();
   await consumer.subscribe({ topic: TOPICS.SEND_EMAIL, fromBeginning: true });
 
