@@ -11,6 +11,7 @@ declare module 'fastify' {
       'X-User-Id': string | undefined;
     };
 
+    internal: boolean;
     authenticated: boolean;
     userId: number;
   }

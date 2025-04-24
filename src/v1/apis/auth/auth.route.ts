@@ -102,6 +102,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
           },
         },
         auth: false,
+        internalOnly: true,
       },
     },
     {
