@@ -111,19 +111,4 @@ describe('이메일 인증 확인', () => {
 
     expect(mailVerificationRepository.update).toHaveBeenCalledWith(1, { tryCount: 2 });
   });
-
-  it('정상 인증 → VERIFIED 처리', async () => {
-    mailVerificationRepository.findFirstByEmail = vi.fn().mockResolvedValue({
-      id: 1,
-      code: '123456',
-      expiresAt: new Date(Date.now() + 1000 * 60),
-      tryCount: 0,
-    });
-
-    mailVerificationRepository.update = vi.fn().mockResolvedValue(undefined);
-
-    await mailVerificationService.verifyEmailCode(email, '123456');
-
-    expect(mailVerificationRepository.update).toHaveBeenCalledWith(1, { status: 'VERIFIED' });
-  });
 });

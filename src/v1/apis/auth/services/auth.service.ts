@@ -24,12 +24,16 @@ export default class AuthService {
     nickname,
     mailVerificationCode,
   }: TypeOf<typeof signupInputSchema>): Promise<TypeOf<typeof signupResponseSchema>> {
-    await this.mailVerificationService.verifyEmailCode(email, mailVerificationCode);
+    const { emailCodeId } = await this.mailVerificationService.verifyEmailCode(
+      email,
+      mailVerificationCode,
+    );
     await this.userService.createUser({
       email,
       password,
       nickname,
     });
+    await this.mailVerificationService.expireEmailCode(emailCodeId);
 
     return {
       status: STATUS.SUCCESS,

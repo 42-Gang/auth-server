@@ -67,4 +67,13 @@ function setDecorate(fastify: FastifyInstance) {
       });
     }
   });
+
+  fastify.decorate('internalOnly', async (request: FastifyRequest, reply: FastifyReply) => {
+    if (!request.internal) {
+      return reply.status(403).send({
+        status: STATUS.ERROR,
+        message: 'Forbidden',
+      });
+    }
+  });
 }

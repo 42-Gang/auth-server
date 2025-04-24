@@ -48,7 +48,7 @@ export default class MailVerificationService {
     };
   }
 
-  async verifyEmailCode(email: string, code: string) {
+  async verifyEmailCode(email: string, code: string): Promise<{ emailCodeId: number }> {
     const verification = await this.mailVerificationRepository.findFirstByEmail(email);
     if (!verification) {
       throw new NotFoundException('Verification code not found.');
@@ -64,7 +64,11 @@ export default class MailVerificationService {
       throw new UnAuthorizedException('Invalid verification code.');
     }
 
-    await this.mailVerificationRepository.update(verification.id, { status: 'VERIFIED' });
+    return { emailCodeId: verification.id };
+  }
+
+  async expireEmailCode(id: number) {
+    await this.mailVerificationRepository.update(id, { status: 'VERIFIED' });
   }
 
   private generateVerificationCode(length: number = 6): string {

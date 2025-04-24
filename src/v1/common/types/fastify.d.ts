@@ -3,6 +3,7 @@ import 'fastify';
 declare module 'fastify' {
   interface FastifyInstance {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    internalOnly: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 
   interface FastifyRequest {
@@ -11,6 +12,7 @@ declare module 'fastify' {
       'X-User-Id': string | undefined;
     };
 
+    internal: boolean;
     authenticated: boolean;
     userId: number;
   }
