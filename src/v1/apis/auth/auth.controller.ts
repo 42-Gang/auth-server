@@ -38,7 +38,7 @@ export default class AuthController {
     });
     reply.status(200).send({
       status: STATUS.SUCCESS,
-      message: 'Login successful',
+      message: '로그인에 성공했습니다.',
       data: {
         accessToken,
       },
@@ -54,7 +54,7 @@ export default class AuthController {
   refreshAccessToken = async (request: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = request.cookies.refreshToken;
     if (!refreshToken) {
-      throw new UnAuthorizedException('No refresh token');
+      throw new UnAuthorizedException('리프레시 토큰이 존재하지 않습니다.');
     }
 
     const result = await this.tokenService.refreshAccessToken(refreshToken);
@@ -67,7 +67,7 @@ export default class AuthController {
     });
     reply.status(200).send({
       status: STATUS.SUCCESS,
-      message: 'Access token refreshed successfully',
+      message: '액세스 토큰이 성공적으로 갱신되었습니다.',
       data: {
         accessToken: result.accessToken,
       },
@@ -79,7 +79,7 @@ export default class AuthController {
     reply.clearCookie('refreshToken');
     reply.status(200).send({
       status: STATUS.SUCCESS,
-      message: 'Logout successful',
+      message: '로그아웃이 성공적으로 완료되었습니다.',
     });
   };
 
@@ -110,7 +110,7 @@ export default class AuthController {
     reply.header('X-User-Id', result.userId);
     reply.status(200).send({
       status: STATUS.SUCCESS,
-      message: 'Access token verified successfully',
+      message: '액세스 토큰이 정상적으로 확인되었습니다.',
     });
   };
 }

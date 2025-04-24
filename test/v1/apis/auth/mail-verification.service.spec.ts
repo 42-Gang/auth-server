@@ -45,7 +45,7 @@ describe('이메일 인증 요청', () => {
     const result = await mailVerificationService.requestVerificationCode('test@naver.com');
 
     expect(result.status).toBe(STATUS.SUCCESS);
-    expect(result.message).toBe('Verification code sent successfully.');
+    expect(result.message).toBe('인증 코드가 성공적으로 전송되었습니다.');
     expect(sendVerificationCodeMail).toHaveBeenCalled();
   });
 

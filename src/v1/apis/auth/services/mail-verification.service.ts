@@ -44,24 +44,24 @@ export default class MailVerificationService {
     await sendVerificationCodeMail(email, code);
     return {
       status: STATUS.SUCCESS,
-      message: 'Verification code sent successfully.',
+      message: '인증 코드가 성공적으로 전송되었습니다.',
     };
   }
 
   async verifyEmailCode(email: string, code: string): Promise<{ emailCodeId: number }> {
     const verification = await this.mailVerificationRepository.findFirstByEmail(email);
     if (!verification) {
-      throw new NotFoundException('Verification code not found.');
+      throw new NotFoundException('인증 코드를 찾을 수 없습니다.');
     }
     if (verification.expiresAt < new Date() || verification.tryCount >= 3) {
-      throw new UnAuthorizedException('Invalid or expired verification code.');
+      throw new UnAuthorizedException('유효하지 않거나 만료된 인증 코드입니다.');
     }
 
     if (verification.code !== code) {
       await this.mailVerificationRepository.update(verification.id, {
         tryCount: verification.tryCount + 1,
       });
-      throw new UnAuthorizedException('Invalid verification code.');
+      throw new UnAuthorizedException('잘못된 인증 코드입니다.');
     }
 
     return { emailCodeId: verification.id };
