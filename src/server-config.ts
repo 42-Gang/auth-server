@@ -9,7 +9,7 @@ import { Server } from 'socket.io';
 import { connectKafkaProducer } from './plugins/kafka.js';
 import { fastifyCookie } from '@fastify/cookie';
 import { fastifyCors } from '@fastify/cors';
-import { startMailConsumer } from './mail/mail.consumer.js';
+import { startMailConsumer } from './mail/mail-template.js';
 
 export async function configureServer(server: FastifyInstance) {
   server.setValidatorCompiler(validatorCompiler); // Fastify 유효성 검사기 설정
