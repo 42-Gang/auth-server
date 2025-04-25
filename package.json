@@ -9,7 +9,7 @@
     "dev": "dotenv -e .env.dev -- tsx watch src/main.ts",
     "run:ts": "tsx src/main.ts",
     "watch:ts": "tsx watch src/main.ts",
-    "build:ts": "tsc",
+    "build:ts": "tsc && cp -R src/mail/templates dist/src/mail/templates",
     "clean": "rm -rf dist",
     "lint": "eslint ./src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
