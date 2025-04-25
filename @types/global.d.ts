@@ -25,7 +25,8 @@ declare global {
 
       KAFKA_BROKER: string;
 
-
+      GMAIL_USER: string;
+      GMAIL_APP_PASS: string;
     }
   }
 }

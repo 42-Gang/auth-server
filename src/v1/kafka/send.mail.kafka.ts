@@ -3,12 +3,14 @@ import { TOPICS } from '../common/constants/topics.js';
 
 export const sendVerificationCodeMail = async (email: string, verificationCode: string) => {
   await producer.send({
-    topic: TOPICS.SEND_EMAIL,
+    topic: TOPICS.MAIL,
     messages: [
       {
         value: JSON.stringify({
+          eventType: 'SEND_VERIFICATION_CODE',
           email,
-          verificationCode,
+          code: verificationCode,
+          timestamp: Date.now(),
         }),
       },
     ],

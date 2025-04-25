@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import { connectKafkaProducer } from './plugins/kafka.js';
 import { fastifyCookie } from '@fastify/cookie';
 import { fastifyCors } from '@fastify/cors';
+import { startMailConsumer } from './mail/mail.consumer.js';
 
 export async function configureServer(server: FastifyInstance) {
   server.setValidatorCompiler(validatorCompiler); // Fastify 유효성 검사기 설정
@@ -29,6 +30,7 @@ export async function registerPlugins(server: FastifyInstance) {
   await registerSwaggerPlugin(server); // Swagger 플러그인 등록
   await connectKafkaProducer(); // Kafka 프로듀서 연결
   await server.register(app, { prefix: '/api' }); // REST API 라우트 등록
+  startMailConsumer();
 }
 
 export async function setupGracefulShutdown(server: FastifyInstance, socket: Server) {
