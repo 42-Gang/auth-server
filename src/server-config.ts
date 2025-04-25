@@ -19,7 +19,7 @@ export async function configureServer(server: FastifyInstance) {
 
 export async function registerPlugins(server: FastifyInstance) {
   server.register(fastifyCors, {
-    origin: 'http://localhost:5173', // 모든 출처 허용
+    origin: ['http://localhost:5173'], // 모든 출처 허용
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // 허용할 HTTP 메서드
     allowedHeaders: ['Content-Type', 'Authorization'], // 허용할 헤더
     credentials: true, // 쿠키 전송 허용
