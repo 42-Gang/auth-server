@@ -41,7 +41,7 @@ export default class UserService {
       body: { email, password },
     });
     if (response.statusCode !== 200) {
-      throw new UnAuthorizedException('Invalid credentials.');
+      throw new UnAuthorizedException('유효하지 않은 자격 증명입니다.');
     }
     return response.body.data.userId;
   }
@@ -55,7 +55,7 @@ export default class UserService {
       },
     });
     if (response.statusCode !== 200) {
-      throw new ConflictException('Email already exists.');
+      throw new ConflictException('이미 가입한 이메일입니다.');
     }
   }
 }

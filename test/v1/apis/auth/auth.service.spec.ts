@@ -32,7 +32,7 @@ const mockGotClientRequest = (requests: { statusCode: number; body: object }[]) 
   let callIndex = 0;
   gotClient.request = vi.fn().mockImplementation(() => {
     if (callIndex >= requests.length) {
-      throw new Error('No more mock requests available');
+      throw new Error('더 이상 모의 요청이 없습니다.');
     }
     const response = requests[callIndex];
     callIndex++;
@@ -71,7 +71,7 @@ describe('로그인', () => {
 
     const payload = jsonwebtoken.verify(result.accessToken, 'secret');
     if (typeof payload === 'string') {
-      throw new Error('Payload is not an object');
+      throw new Error('페이로드는 객체여야 합니다.');
     }
 
     expect(result.refreshToken).toBe('refreshToken');

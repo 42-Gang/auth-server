@@ -29,7 +29,7 @@ export default class TokenService {
   async refreshAccessToken(refreshToken: string) {
     const foundToken = await this.refreshTokenRepository.findByRefreshToken(refreshToken);
     if (!foundToken || foundToken.expiresAt < new Date()) {
-      throw new UnAuthorizedException('Invalid refresh token.');
+      throw new UnAuthorizedException('유효하지 않은 리프레시 토큰입니다.');
     }
 
     await this.refreshTokenRepository.update(foundToken.id, { status: 'INACTIVE' });
