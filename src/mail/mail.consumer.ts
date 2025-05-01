@@ -23,7 +23,7 @@ async function handleMailTopic(messageValue: string) {
 
 export async function startMailConsumer() {
   await consumer.connect();
-  await consumer.subscribe({ topic: TOPICS.MAIL, fromBeginning: true });
+  await consumer.subscribe({ topic: TOPICS.MAIL, fromBeginning: false });
 
   await consumer.run({
     eachMessage: async ({ topic, message }) => {
