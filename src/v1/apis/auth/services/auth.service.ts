@@ -45,7 +45,7 @@ export default class AuthService {
   async logout(userId: number) {
     await this.tokenService.expireRefreshTokens(userId);
     await produceLogoutEvent(userId);
-    //TODOs: userID redis blacklist에 추가
+    // TODO: userID redis blacklist에 추가
   }
 
   async refreshAccessToken(refreshToken: string) {
