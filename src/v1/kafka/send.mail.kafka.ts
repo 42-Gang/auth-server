@@ -30,4 +30,4 @@ export const produceLogoutEvent = async (userId: number) => {
       },
     ],
   });
-}
+};
