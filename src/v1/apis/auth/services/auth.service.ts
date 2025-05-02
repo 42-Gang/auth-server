@@ -4,6 +4,7 @@ import { STATUS } from '../../../common/constants/status.js';
 import UserService from './user.service.js';
 import TokenService from './token.service.js';
 import MailVerificationService from './mail-verification.service.js';
+import { produceLogoutEvent } from 'src/v1/kafka/send.mail.kafka.js';
 
 export default class AuthService {
   constructor(
@@ -43,7 +44,8 @@ export default class AuthService {
 
   async logout(userId: number) {
     await this.tokenService.expireRefreshTokens(userId);
-    // TODO: 로그아웃시 kafka 메시지 전송 -> 해당 유저의 소켓을 종료하거나, 유저 상태, userId를 blacklist에 추가 등 처리
+    await produceLogoutEvent(userId);
+    // TODO: userID redis blacklist에 추가
   }
 
   async refreshAccessToken(refreshToken: string) {
