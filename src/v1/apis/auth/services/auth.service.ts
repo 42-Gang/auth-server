@@ -45,7 +45,7 @@ export default class AuthService {
   async logout(userId: number) {
     await this.tokenService.expireRefreshTokens(userId);
     await produceLogoutEvent(userId);
-    // TODO: 로그아웃시 kafka 메시지 전송 -> 해당 유저의 소켓을 종료하거나, 유저 상태, userId를 blacklist에 추가 등 처리
+    //userID redis blacklist에 추가
   }
 
   async refreshAccessToken(refreshToken: string) {
