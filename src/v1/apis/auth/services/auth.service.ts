@@ -4,7 +4,7 @@ import { STATUS } from '../../../common/constants/status.js';
 import UserService from './user.service.js';
 import TokenService from './token.service.js';
 import MailVerificationService from './mail-verification.service.js';
-import { produceLogoutEvent } from 'src/v1/kafka/send.mail.kafka.js';
+import { produceLogoutEvent } from 'src/v1/kafka/produce.logout.kafka.js';
 
 export default class AuthService {
   constructor(
