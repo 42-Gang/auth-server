@@ -1,5 +1,5 @@
 # 1. Build Stage
-FROM node:22.14.0 AS builder
+FROM node:22-bullseye-slim AS builder
 
 WORKDIR /app
 COPY package*.json ./
@@ -10,7 +10,7 @@ RUN npx prisma generate
 RUN npm run build:ts
 
 # 2. Production Stage
-FROM node:22.14.0
+FROM node:22-bullseye-slim
 
 WORKDIR /usr/src/app
 
@@ -22,7 +22,7 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-# ✅ 마이그레이션은 build 시 하지 않음
+ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
 EXPOSE 3000
 
