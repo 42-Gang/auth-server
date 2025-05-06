@@ -22,8 +22,6 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
-
 EXPOSE 3000
 
 # ✅ ENTRYPOINT에서 prisma migrate 실행 (실제 런타임에서 DB 접근 가능할 때!)
