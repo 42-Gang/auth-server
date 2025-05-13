@@ -47,7 +47,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       },
     },
     {
-      method: 'GET',
+      method: 'POST',
       url: '/logout',
       handler: authController.logout,
       options: {

@@ -24,7 +24,7 @@ function setErrorHandler(fastify: FastifyInstance) {
 }
 
 function setMiddleware(fastify: FastifyInstance) {
-  fastify.addHook('onRequest', async (request, reply) => {
+  fastify.addHook('onRequest', async (request, _reply) => {
     const internal = request.headers['x-internal'];
     const authenticated = request.headers['x-authenticated'];
     const userId = request.headers['x-user-id'];
