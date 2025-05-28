@@ -1,7 +1,7 @@
 import { UserOAuth } from "@prisma/client";
 import { OAuthCacheInterface } from "../interfaces/oauth.cache.interface.js";
 import { FastifyRedis } from "@fastify/redis";
-import { BeginOAuthProvider } from "src/v1/apis/oauth/schemas/beginOAuth.schema.js";
+import { BeginOAuthProvider } from "src/v1/apis/oauth/oauth.schema.js";
 
 export default class OAuthCacheRepository implements OAuthCacheInterface {
     constructor(private readonly redisClient: FastifyRedis) {}
@@ -26,5 +26,11 @@ export default class OAuthCacheRepository implements OAuthCacheInterface {
 
     async setState(key: string, value: BeginOAuthProvider, ttlSeconds?: number): Promise<void> {
         await this.redisClient.set(key, JSON.stringify(value));
+    }
+
+    async getState(key: string): Promise<BeginOAuthProvider | null> {
+        const data = await this.redisClient.get(key);
+        if (!data) return null;
+        return JSON.parse(data);
     }
 }
