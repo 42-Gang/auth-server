@@ -23,9 +23,10 @@ export const handleOAuthResponseSchema = createResponseSchema(
 
 export type HandleOAuthRequest = TypeOf<typeof handleOAuthRequestSchema>;
 
-export const googleUserInfoSchema = z.object({
+export const OAuthUserInfoSchema = z.object({
     id: z.string(),
     email: z.string(),
+    name: z.string(),
 });
 
-export type GoogleUserInfo = TypeOf<typeof googleUserInfoSchema>;
+export type OAuthUserInfoType = TypeOf<typeof OAuthUserInfoSchema>;
