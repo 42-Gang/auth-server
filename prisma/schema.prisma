@@ -25,6 +25,20 @@ model RefreshToken {
   @@map("refresh_token")
 }
 
+enum OAuthProvider {
+  GOOGLE
+}
+
+model UserOAuth {
+  id             Int            @id @default(autoincrement())
+  userId         Int            @map("user_id")
+  provider       OAuthProvider  
+  providerUserId String         @map("provider_user_id")
+
+  @@unique([provider, providerUserId])
+  @@map("user_oauth")
+}
+
 enum MailVerificationStatus {
   PENDING
   EXPIRED
