@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, UserOAuth } from "@prisma/client";
+import { OAuthProvider, Prisma, PrismaClient, UserOAuth } from "@prisma/client";
 import { OAuthRepositoryInterface } from "../interfaces/OAuth.repository.interface.js";
 
 export default class OAuthRepository implements OAuthRepositoryInterface {
@@ -23,13 +23,25 @@ export default class OAuthRepository implements OAuthRepositoryInterface {
     });
   }
 
-    delete(id: number): Promise<UserOAuth> {
-        return this.prisma.userOAuth.delete({
+  delete(id: number): Promise<UserOAuth> {
+      return this.prisma.userOAuth.delete({
       where: { id },
     });
   }
 
-    findAll(): Promise<UserOAuth[]> {
-        return this.prisma.userOAuth.findMany();
+  findAll(): Promise<UserOAuth[]> {
+      return this.prisma.userOAuth.findMany();
     }
+
+  findByProviderAndProviderId(
+    provider: OAuthProvider,
+    providerUserId: string
+  ): Promise<UserOAuth | null> {
+    return this.prisma.userOAuth.findFirst({
+      where: {
+        provider,
+        providerUserId,
+      },
+    });
+  }
 }
