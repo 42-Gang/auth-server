@@ -18,10 +18,11 @@ export default class OAuthController {
         const body = handleOAuthRequestSchema.parse(request.body);
         const provider = oAuthProviderSchema.parse(request.params).provider;
 
-        if (provider == 'GOOGLE') {
-            this.oauthService.googleOAuth(body);
-        } else {
-            throw new BadRequestException('지원하지 않는 OAuth 제공자입니다.');
-        }
+        await this.oauthService.handleOAuthFlow(provider, body);
+        // if (provider == 'GOOGLE') {
+        //     this.oauthService.googleOAuth(body);
+        // } else {
+        //     throw new BadRequestException('지원하지 않는 OAuth 제공자입니다.');
+        // }
     }
 }
