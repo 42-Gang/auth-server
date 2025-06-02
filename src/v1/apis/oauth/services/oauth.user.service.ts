@@ -1,28 +1,26 @@
-import { GotClient } from "src/plugins/http.client.js";
-import { OAuthUserInputType } from "../oauth.schema.js";
-import { HttpException } from "src/v1/common/exceptions/core.error.js";
+import { GotClient } from 'src/plugins/http.client.js';
+import { OAuthUserInputType } from '../oauth.schema.js';
+import { HttpException } from 'src/v1/common/exceptions/core.error.js';
 
 export default class OAuthUserService {
-  constructor(
-    private readonly httpClient: GotClient
-  ) {}
+  constructor(private readonly httpClient: GotClient) {}
 
   async createOAuthUser(userData: OAuthUserInputType) {
     const response = await this.httpClient.request<{
-        message: string;
-        data: {
-            userId: number;
-        }
+      message: string;
+      data: {
+        userId: number;
+      };
     }>({
-        method: 'POST',
-        url: `http://${process.env.USER_SERVER_URL}/api/v1/users/oauth`,
-        headers: {
-          'X-Internal': 'true',
-        },
-        body: {
-            email: userData.email,
-            nickname: userData.nickname,
-        },
+      method: 'POST',
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/oauth`,
+      headers: {
+        'X-Internal': 'true',
+      },
+      body: {
+        email: userData.email,
+        nickname: userData.nickname,
+      },
     });
 
     if (response.statusCode !== 201) {
@@ -34,20 +32,20 @@ export default class OAuthUserService {
 
   async getOAuthUserByEmail(userData: OAuthUserInputType) {
     const response = await this.httpClient.request<{
-        message: string;
-        data: {
-            userId?: number;
-            exists: boolean;
-        }
+      message: string;
+      data: {
+        userId?: number;
+        exists: boolean;
+      };
     }>({
-        method: 'POST',
-        url: `http://${process.env.USER_SERVER_URL}/api/v1/users/oauth/existence`,
-        headers: {
-            'X-Internal': 'true',
-        },
-        body: {
-            email: userData.email,
-        },
+      method: 'POST',
+      url: `http://${process.env.USER_SERVER_URL}/api/v1/users/oauth/existence`,
+      headers: {
+        'X-Internal': 'true',
+      },
+      body: {
+        email: userData.email,
+      },
     });
 
     if (response.statusCode !== 200) {
@@ -56,5 +54,4 @@ export default class OAuthUserService {
 
     return response.body.data;
   }
-
 }

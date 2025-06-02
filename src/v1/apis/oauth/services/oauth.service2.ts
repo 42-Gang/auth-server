@@ -29,7 +29,7 @@
 //         private readonly tokenService: TokenService,
 //         private readonly userService: UserService,
 //     ) {}
-    
+
 //     async beginOAuth(provider: OAuthProvider) : Promise<string> { //공통
 //         const state = crypto.randomBytes(16).toString('hex');
 //         const scopes = oAuthScopes;
@@ -68,7 +68,7 @@
 //     }//getAccessToken
 
 //     async getGoogleUserInfo(tokens: Credentials): Promise<GoogleUserInfo>  { //공통
-//         oAuthScopes.forEach(scope => {  
+//         oAuthScopes.forEach(scope => {
 //             if (!tokens.scope?.includes(scope)) {
 //                 throw new UnAuthorizedException(`구글 사용자 정보에 접근할 권한이 없습니다. 필요한 권한: ${scope}`);
 //             }
@@ -91,7 +91,7 @@
 //         if (oauthUser) {
 //             return oauthUser.userId;
 //         }
-        
+
 //         //TODO :일반 로그인에 대한 이메일 검증 로직 필요 (user_server api 호출)
 
 //         // 에러 응답
@@ -117,7 +117,7 @@
 //         // const userId = await this.oauthRepository.create({
 //         //     provider: 'GOOGLE',
 //         //     providerUserId: userInfo.id,
-//         //     userId: 
+//         //     userId:
 //         // });
 
 //         // if (!userId) {
@@ -136,7 +136,7 @@
 //         if (!code || !state) {
 //             throw new BadRequestException('유효하지 않은 OAuth 요청입니다.');
 //         }
-        
+
 //         await this.checkOAuthState(state);
 //         await this.getGoogleAccessToekn(code);
 //         const userInfo = await this.getGoogleUserInfo(oAuthClient.credentials);

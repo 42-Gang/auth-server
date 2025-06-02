@@ -1,5 +1,4 @@
-import { OAuthProvider } from "@prisma/client";
-import { HandleOAuthRequest, OAuthTokenResponseType, OAuthUserInfoType } from "../oauth.schema.js";
+import { HandleOAuthRequest, OAuthTokenResponseType } from '../oauth.schema.js';
 
 export interface OAuthCredentials {
   accessToken: string;
