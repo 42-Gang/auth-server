@@ -2,9 +2,8 @@ import { OAuthRepositoryInterface } from "src/v1/storage/database/interfaces/OAu
 import { OAuthCredentials, OAuthService } from "./oauth.service.js";
 import { OAuthCacheInterface } from "src/v1/storage/cache/interfaces/oauth.cache.interface.js";
 import TokenService from "../../auth/services/token.service.js";
-import UserService from "../../auth/services/user.service.js";
 import { google } from "googleapis";
-import { HandleOAuthRequest, OAuthUserInfoSchema, OAuthUserInfoType } from "../oauth.schema.js";
+import { HandleOAuthRequest, OAuthTokenResponseType, OAuthUserInfoSchema, OAuthUserInfoType } from "../oauth.schema.js";
 import { OAuthProvider } from "@prisma/client";
 import crypto from 'crypto';
 import { BadRequestException, UnAuthorizedException } from "src/v1/common/exceptions/core.error.js";
@@ -50,16 +49,19 @@ export default class GoogleOAuthService implements OAuthService {
         return authorizationUrl;
     }
 
-    async getAccessToken(code: string): Promise<OAuthCredentials> {
+    private async getCredentials(code: string): Promise<OAuthCredentials> {
         const { tokens } = await oAuthClient.getToken(code);
         oAuthClient.setCredentials(tokens);
         if (!tokens || !tokens.access_token) {
             throw new BadRequestException('구글 OAuth 인증에 실패했습니다. 다시 시도해주세요.');
         }
-        return { accessToken: tokens.access_token };
+        return { 
+            accessToken: tokens.access_token,
+            scope: tokens.scope
+        };
     }
 
-    async getUserInfo(tokens: OAuthCredentials): Promise<OAuthUserInfoType> {
+    private async getUserInfo(tokens: OAuthCredentials): Promise<OAuthUserInfoType> {
         oAuthScopes.forEach(scope => {  
             if (!tokens.scope?.includes(scope)) {
                 throw new UnAuthorizedException(`구글 사용자 정보에 접근할 권한이 없습니다. 필요한 권한: ${scope}`);
@@ -78,8 +80,9 @@ export default class GoogleOAuthService implements OAuthService {
         return result.data;
     }
 
-    async checkOAuthUserExists(userInfo: OAuthUserInfoType): Promise<number | null> {
-        const oauthUser = await this.oauthRepository.findByProviderAndProviderId('GOOGLE', userInfo.id);
+    private async checkOAuthUserExists(userInfo: OAuthUserInfoType): Promise<number | null> {
+        const provider = await this.getProviderName();provider
+        const oauthUser = await this.oauthRepository.findByProviderAndProviderId(provider, userInfo.id);
         if (oauthUser) {
             return oauthUser.userId;
         }
@@ -87,7 +90,7 @@ export default class GoogleOAuthService implements OAuthService {
     }
 
 
-    async checkGeneralUserExists(userInfo: OAuthUserInfoType): Promise<number | null> {
+    private async checkGeneralUserExists(userInfo: OAuthUserInfoType): Promise<number | null> {
 
         const user = await this.oauthUserService.getOAuthUserByEmail({
             email: userInfo.email,
@@ -100,20 +103,29 @@ export default class GoogleOAuthService implements OAuthService {
         return null;
     }
 
-    async getProviderName(): Promise<OAuthProvider> {
+    private async getProviderName(): Promise<OAuthProvider> {
         return OAuthProvider.GOOGLE;
     }
 
-    async generateAccessToken(userId: number): Promise<{
-        accessToken: string;
-        refreshToken: string;
-        refreshTokenExpiresAt: Date;
-    }> {
+    private async generateAccessToken(userId: number): Promise<OAuthTokenResponseType> {
         await this.tokenService.expireRefreshTokens(userId);
-        return await this.tokenService.generateTokens(userId);
+        const tokens =  await this.tokenService.generateTokens(userId);
+        return {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+        };
     }
 
-    async handleOAuthFlow(parsed: HandleOAuthRequest): Promise<OAuthUserInfoType | null> {
+    private async checkOAuthState(state: string): Promise<boolean> {
+        const cachedState = await this.oautCacheRepository.getState(`oauth:state:${state}`);
+        if (!cachedState) {
+            throw new UnAuthorizedException('유효하지 않은 또는 만료된 state 파라미터입니다.');
+        }
+        return true;
+    }
+
+    async handleOAuthFlow(parsed: HandleOAuthRequest): Promise<OAuthTokenResponseType> {
         if ("error" in parsed) {
             throw new BadRequestException(parsed.error); //TODO 에러 처리 개선 필요 (사용자 구글 auth 과정에서 생기는 모든 에러 처리)
         }
@@ -124,11 +136,41 @@ export default class GoogleOAuthService implements OAuthService {
         }
         
         await this.checkOAuthState(state);
-        await this.getAccessToken(code);
-        const userInfo = await this.getUserInfo(oAuthClient.credentials);
+        const credentials = await this.getCredentials(code);
+
+        const userInfo = await this.getUserInfo({
+            accessToken: credentials.accessToken,
+            scope: credentials.scope,
+        });
+
         const userId = await this.checkOAuthUserExists(userInfo);
         if (userId) {
             return await this.generateAccessToken(userId); // 이미 존재하는 OAuth 사용자
         }
+
+        const generalUserId = await this.checkGeneralUserExists(userInfo);
+        if (generalUserId) {
+            await this.oauthRepository.create({
+                provider: await this.getProviderName(),
+                providerUserId: userInfo.id,
+                userId: generalUserId,
+            });
+            return await this.generateAccessToken(generalUserId); // 일반 사용자로 존재하는 경우
+        }
+
+        const newUser = await this.oauthUserService.createOAuthUser({
+            email: userInfo.email,
+            nickname: userInfo.name,
+        });
+        
+        if (!newUser) {
+            throw new BadRequestException('사용자 생성에 실패했습니다. 다시 시도해주세요.');
+        }
+        await this.oauthRepository.create({
+            provider: await this.getProviderName(),
+            providerUserId: userInfo.id,
+            userId: newUser.userId,
+        });
+        return await this.generateAccessToken(newUser.userId); // 새로운 OAuth 사용자 생성
     }
 }

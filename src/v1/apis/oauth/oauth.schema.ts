@@ -37,3 +37,12 @@ export const oauthUserInputSchema = z.object({
 });
 
 export type OAuthUserInputType = TypeOf<typeof oauthUserInputSchema>;
+
+export const oauthTokenResponseSchema  = 
+    z.object({
+        accessToken: z.string(),
+        refreshToken: z.string(),
+        refreshTokenExpiresAt: z.date(),
+    });
+
+export type OAuthTokenResponseType = TypeOf<typeof oauthTokenResponseSchema>;

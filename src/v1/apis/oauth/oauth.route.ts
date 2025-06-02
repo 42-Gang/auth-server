@@ -10,7 +10,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         {
             method: 'GET',
             url: '/oauth/:provider',
-            handler: oauthController.beginOAuth,
+            handler: oauthController.getAuthorizationUrl,
             options: {
                 schema: {
                     tags: ['oauth'],

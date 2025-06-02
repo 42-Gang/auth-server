@@ -1,17 +1,19 @@
 import { OAuthProvider } from "@prisma/client";
-import { OAuthUserInfoType } from "../oauth.schema.js";
+import { HandleOAuthRequest, OAuthTokenResponseType, OAuthUserInfoType } from "../oauth.schema.js";
 
 export interface OAuthCredentials {
   accessToken: string;
-  refreshToken?: string;
   scope?: string;
 }
 
 export interface OAuthService {
   getAuthorizationUrl(): Promise<string>;
-  getAccessToken(code: string): Promise<OAuthCredentials>;
-  getUserInfo(tokens: OAuthCredentials): Promise<OAuthUserInfoType>;
-  checkUserExists(userInfo: OAuthUserInfoType): Promise<number | null>;
-  getProviderName(): Promise<OAuthProvider>;
-  handleOAuthFlow(): Promise<OAuthUserInfoType | null>;
+  handleOAuthFlow(parsed: HandleOAuthRequest): Promise<OAuthTokenResponseType>;
+  // getCredentials(code: string): Promise<OAuthCredentials>;
+  // getUserInfo(tokens: OAuthCredentials): Promise<OAuthUserInfoType>;
+  // checkOAuthUserExists(userInfo: OAuthUserInfoType): Promise<number | null>;
+  // checkGeneralUserExists(userInfo: OAuthUserInfoType): Promise<number | null>;
+  // getProviderName(): Promise<OAuthProvider>;
+  // oauthLogin(userId: number, userInfo: OAuthUserInfoType): Promise<OAuthTokenResponseType>;
+  // oauthSignup(userInfo: OAuthUserInfoType): Promise<OAuthTokenResponseType>
 }
