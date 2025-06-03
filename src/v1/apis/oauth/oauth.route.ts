@@ -38,7 +38,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
           params: oAuthProviderSchema,
           body: handleOAuthRequestSchema,
           response: {
-            200: handleOAuthResponseSchema,
+            201: handleOAuthResponseSchema,
           },
         },
         auth: false,
