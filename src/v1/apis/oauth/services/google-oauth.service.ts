@@ -14,14 +14,9 @@ import crypto from 'crypto';
 import { BadRequestException, UnAuthorizedException } from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
 import { FastifyBaseLogger } from 'fastify';
+import { OAuth2Client } from 'google-auth-library';
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
-
-const oAuthClient = new google.auth.OAuth2(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  process.env.REDIRECT_URI,
-);
 
 const oAuthScopes = [
   'https://www.googleapis.com/auth/userinfo.email',
@@ -42,7 +37,13 @@ export default class GoogleOauthService implements OAuthService {
     const scopes = oAuthScopes;
 
     this.oauthCacheRepository.setState(`oauth:state:${state}`, { provider: 'google' }, 300);
-
+    
+    const oAuthClient = new google.auth.OAuth2(
+      GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET,
+      process.env.REDIRECT_URI,
+    );
+    
     const authorizationUrl = oAuthClient.generateAuthUrl({
       access_type: 'online',
       scope: scopes,
@@ -52,10 +53,10 @@ export default class GoogleOauthService implements OAuthService {
     return authorizationUrl;
   }
 
-  private async getCredentials(code: string): Promise<OAuthCredentials> {
+  private async getCredentials(code: string, client: OAuth2Client): Promise<OAuthCredentials> {
     this.logger.info(`code: ${code}`);
-    const { tokens } = await oAuthClient.getToken(code);
-    oAuthClient.setCredentials(tokens);
+    const { tokens } = await client.getToken(code);
+    client.setCredentials(tokens);
     if (!tokens || !tokens.access_token) {
       throw new BadRequestException('구글 OAuth 인증에 실패했습니다. 다시 시도해주세요.');
     }
@@ -65,7 +66,7 @@ export default class GoogleOauthService implements OAuthService {
     };
   }
 
-  private async getUserInfo(tokens: OAuthCredentials): Promise<OAuthUserInfoType> {
+  private async getUserInfo(tokens: OAuthCredentials, client: OAuth2Client): Promise<OAuthUserInfoType> {
     oAuthScopes.forEach((scope) => {
       if (!tokens.scope?.includes(scope)) {
         throw new UnAuthorizedException(
@@ -74,7 +75,7 @@ export default class GoogleOauthService implements OAuthService {
       }
     });
 
-    const userInfoResponse = await oAuthClient.request({
+    const userInfoResponse = await client.request({
       url: 'https://www.googleapis.com/oauth2/v2/userinfo',
     });
 
@@ -139,13 +140,18 @@ export default class GoogleOauthService implements OAuthService {
       throw new BadRequestException('유효하지 않은 OAuth 요청입니다.');
     }
 
+    const oAuthClient = new google.auth.OAuth2(
+      GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET,
+      process.env.REDIRECT_URI,
+    );
     await this.checkOAuthState(state);
-    const credentials = await this.getCredentials(code);
+    const credentials = await this.getCredentials(code, oAuthClient);
 
     const userInfo = await this.getUserInfo({
       accessToken: credentials.accessToken,
       scope: credentials.scope,
-    });
+    }, oAuthClient);
 
     const userId = await this.checkOAuthUserExists(userInfo);
     if (userId) {
