@@ -13,8 +13,7 @@
     "jsonBody": {
       "message": "OAuth user existence checked",
       "data": {
-        "exists": true,
-        "userId": 1234
+        "exists": false
       }
     },
     "headers": {

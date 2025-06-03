@@ -6,22 +6,14 @@
       "X-Internal": {
         "equalTo": "true"
       }
-    },
-    "bodyPatterns": [
-      {
-        "matchesJsonPath": "$[?(@.email)]"
-      },
-      {
-        "matchesJsonPath": "$[?(@.nickname)]"
-      }
-    ]
+    }
   },
   "response": {
-    "status": 200,
+    "status": 201,
     "jsonBody": {
       "message": "OAuth user created",
       "data": {
-        "userId": 1234
+        "userId": 124551515
       }
     },
     "headers": {
