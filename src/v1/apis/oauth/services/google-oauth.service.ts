@@ -34,7 +34,7 @@ export default class GoogleOauthService implements OAuthService {
     private readonly oauthCacheRepository: OAuthCacheInterface,
     private readonly tokenService: TokenService,
     private readonly oauthUserService: OAuthUserService,
-    private readonly logger: FastifyBaseLogger
+    private readonly logger: FastifyBaseLogger,
   ) {}
 
   async getAuthorizationUrl(): Promise<string> {
@@ -53,7 +53,7 @@ export default class GoogleOauthService implements OAuthService {
   }
 
   private async getCredentials(code: string): Promise<OAuthCredentials> {
-    this.logger.info(`code: ${code}`)
+    this.logger.info(`code: ${code}`);
     const { tokens } = await oAuthClient.getToken(code);
     oAuthClient.setCredentials(tokens);
     if (!tokens || !tokens.access_token) {
