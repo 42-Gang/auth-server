@@ -1,9 +1,8 @@
-import { OAuthProvider } from '@prisma/client';
 import { createResponseSchema } from 'src/v1/common/schema/core.schema.js';
 import { TypeOf, z } from 'zod';
 
 export const oAuthProviderSchema = z.object({
-  provider: z.nativeEnum(OAuthProvider),
+  provider: z.enum(['google', 'kakao', 'naver']),
 });
 
 export type BeginOAuthProvider = TypeOf<typeof oAuthProviderSchema>;

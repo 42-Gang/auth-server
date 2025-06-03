@@ -1,5 +1,5 @@
 import { OAuthProvider, Prisma, PrismaClient, UserOAuth } from '@prisma/client';
-import { OAuthRepositoryInterface } from '../interfaces/OAuth.repository.interface.js';
+import { OAuthRepositoryInterface } from '../interfaces/oauth.repository.interface.js';
 
 export default class OAuthRepository implements OAuthRepositoryInterface {
   constructor(private readonly prisma: PrismaClient) {}

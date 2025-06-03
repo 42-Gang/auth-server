@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/v1/users/oauth/existence",
+    "headers": {
+      "X-Internal": {
+        "equalTo": "true"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "message": "OAuth user existence checked",
+      "data": {
+        "exists": true,
+        "userId": 1234
+      }
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

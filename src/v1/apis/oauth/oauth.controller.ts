@@ -1,16 +1,16 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { oAuthProviderSchema, handleOAuthRequestSchema } from './oauth.schema.js';
 import { BadRequestException } from 'src/v1/common/exceptions/core.error.js';
-import GoogleOAuthService from './services/google.oauth.service.js';
+import GoogleOauthService from './services/google-oauth.service.js';
 import { STATUS } from 'src/v1/common/constants/status.js';
 
 export default class OAuthController {
-  constructor(private readonly googleOAuthService: GoogleOAuthService) {}
+  constructor(private readonly googleOauthService: GoogleOauthService) {}
 
   private getOAuthService(provider: string) {
     switch (provider) {
-      case 'GOOGLE':
-        return this.googleOAuthService;
+      case 'google':
+        return this.googleOauthService;
       default:
         throw new BadRequestException('지원하지 않는 OAuth 제공자입니다.');
     }

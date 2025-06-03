@@ -1,4 +1,4 @@
-import { OAuthRepositoryInterface } from 'src/v1/storage/database/interfaces/OAuth.repository.interface.js';
+import { OAuthRepositoryInterface } from 'src/v1/storage/database/interfaces/oauth.repository.interface.js';
 import { OAuthCredentials, OAuthService } from './oauth.service.js';
 import { OAuthCacheInterface } from 'src/v1/storage/cache/interfaces/oauth.cache.interface.js';
 import TokenService from '../../auth/services/token.service.js';
@@ -13,13 +13,14 @@ import { OAuthProvider } from '@prisma/client';
 import crypto from 'crypto';
 import { BadRequestException, UnAuthorizedException } from 'src/v1/common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
+import { FastifyBaseLogger } from 'fastify';
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 
 const oAuthClient = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  'http://localhost:3000/api/v1/oauth/google-callback', // TODO: 수정 필요
+  'http://localhost:4242/test_oauth.html', // TODO: 수정 필요
 );
 
 const oAuthScopes = [
@@ -27,19 +28,20 @@ const oAuthScopes = [
   'https://www.googleapis.com/auth/userinfo.profile',
 ];
 
-export default class GoogleOAuthService implements OAuthService {
+export default class GoogleOauthService implements OAuthService {
   constructor(
     private readonly oauthRepository: OAuthRepositoryInterface,
-    private readonly oautCacheRepository: OAuthCacheInterface,
+    private readonly oauthCacheRepository: OAuthCacheInterface,
     private readonly tokenService: TokenService,
     private readonly oauthUserService: OAuthUserService,
+    private readonly logger: FastifyBaseLogger
   ) {}
 
   async getAuthorizationUrl(): Promise<string> {
     const state = crypto.randomBytes(16).toString('hex');
     const scopes = oAuthScopes;
 
-    this.oautCacheRepository.setState(`oauth:state:${state}`, { provider: 'GOOGLE' }, 300);
+    this.oauthCacheRepository.setState(`oauth:state:${state}`, { provider: 'google' }, 300);
 
     const authorizationUrl = oAuthClient.generateAuthUrl({
       access_type: 'online',
@@ -51,6 +53,7 @@ export default class GoogleOAuthService implements OAuthService {
   }
 
   private async getCredentials(code: string): Promise<OAuthCredentials> {
+    this.logger.info(`code: ${code}`)
     const { tokens } = await oAuthClient.getToken(code);
     oAuthClient.setCredentials(tokens);
     if (!tokens || !tokens.access_token) {
@@ -119,7 +122,7 @@ export default class GoogleOAuthService implements OAuthService {
   }
 
   private async checkOAuthState(state: string): Promise<boolean> {
-    const cachedState = await this.oautCacheRepository.getState(`oauth:state:${state}`);
+    const cachedState = await this.oauthCacheRepository.getState(`oauth:state:${state}`);
     if (!cachedState) {
       throw new UnAuthorizedException('유효하지 않은 또는 만료된 state 파라미터입니다.');
     }

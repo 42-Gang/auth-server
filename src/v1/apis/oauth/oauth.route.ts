@@ -13,7 +13,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
   const routes: Array<Route> = [
     {
       method: 'GET',
-      url: '/oauth/:provider',
+      url: '/:provider',
       handler: oauthController.getAuthorizationUrl,
       options: {
         schema: {
@@ -29,7 +29,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
     },
     {
       method: 'POST',
-      url: '/oauth/:provider/token',
+      url: '/:provider/token',
       handler: oauthController.handleOAuthFlow,
       options: {
         schema: {
