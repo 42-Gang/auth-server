@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { oAuthProviderSchema, handleOAuthRequestSchema } from './oauth.schema.js';
-import { BadRequestException } from 'src/v1/common/exceptions/core.error.js';
+import { BadRequestException } from '../../common/exceptions/core.error.js';
 import GoogleOauthService from './services/google-oauth.service.js';
-import { STATUS } from 'src/v1/common/constants/status.js';
+import { STATUS } from '../../common/constants/status.js';
 
 export default class OAuthController {
   constructor(private readonly googleOauthService: GoogleOauthService) {}

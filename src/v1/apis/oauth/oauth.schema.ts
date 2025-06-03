@@ -1,4 +1,4 @@
-import { createResponseSchema } from 'src/v1/common/schema/core.schema.js';
+import { createResponseSchema } from '../../common/schema/core.schema.js';
 import { TypeOf, z } from 'zod';
 
 export const oAuthProviderSchema = z.object({

@@ -1,7 +1,7 @@
 import { UserOAuth } from '@prisma/client';
 import { OAuthCacheInterface } from '../interfaces/oauth.cache.interface.js';
 import { FastifyRedis } from '@fastify/redis';
-import { BeginOAuthProvider } from 'src/v1/apis/oauth/oauth.schema.js';
+import { BeginOAuthProvider } from '../../../apis/oauth/oauth.schema.js';
 
 export default class OAuthCacheRepository implements OAuthCacheInterface {
   constructor(private readonly redisClient: FastifyRedis) {}

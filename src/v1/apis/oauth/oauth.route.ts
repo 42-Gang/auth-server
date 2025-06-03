@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { addRoutes, Route } from 'src/plugins/router.js';
+import { addRoutes, Route } from '../../../plugins/router.js';
 import OAuthController from './oauth.controller.js';
 import {
   oAuthProviderSchema,

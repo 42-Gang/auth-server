@@ -1,6 +1,6 @@
-import { OAuthRepositoryInterface } from 'src/v1/storage/database/interfaces/oauth.repository.interface.js';
+import { OAuthRepositoryInterface } from '../../../storage/database/interfaces/oauth.repository.interface.js';
 import { OAuthCredentials, OAuthService } from './oauth.service.js';
-import { OAuthCacheInterface } from 'src/v1/storage/cache/interfaces/oauth.cache.interface.js';
+import { OAuthCacheInterface } from '../../../storage/cache/interfaces/oauth.cache.interface.js';
 import TokenService from '../../auth/services/token.service.js';
 import { google } from 'googleapis';
 import {
@@ -11,7 +11,7 @@ import {
 } from '../oauth.schema.js';
 import { OAuthProvider } from '@prisma/client';
 import crypto from 'crypto';
-import { BadRequestException, UnAuthorizedException } from 'src/v1/common/exceptions/core.error.js';
+import { BadRequestException, UnAuthorizedException } from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
 import { FastifyBaseLogger } from 'fastify';
 
@@ -20,7 +20,7 @@ const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 const oAuthClient = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  'http://localhost:4242/test_oauth.html', // TODO: 수정 필요
+  process.env.REDIRECT_URI,
 );
 
 const oAuthScopes = [

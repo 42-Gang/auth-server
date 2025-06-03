@@ -1,6 +1,6 @@
-import { GotClient } from 'src/plugins/http.client.js';
+import { GotClient } from '../../../../plugins/http.client.js';
 import { OAuthUserInputType } from '../oauth.schema.js';
-import { HttpException } from 'src/v1/common/exceptions/core.error.js';
+import { HttpException } from '../../../common/exceptions/core.error.js';
 
 export default class OAuthUserService {
   constructor(private readonly httpClient: GotClient) {}
