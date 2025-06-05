@@ -19,6 +19,8 @@ export type HandleCallbackResponseType = TypeOf<typeof handleCallbackResponseSch
 export type HandleCallbackInputType = TypeOf<typeof handleCallbackInputSchema>;
 
 export interface OAuthService {
+  readonly provider: string;
+
   getLoginUrl(): Promise<string>;
 
   handleCallback(input: HandleCallbackInputType): Promise<HandleCallbackResponseType>;
