@@ -13,6 +13,8 @@ export const oauthTokenResponseSchema = z.object({
   refreshTokenExpiresAt: z.date(),
 });
 
+export type OAuthTokenResponseType = z.infer<typeof oauthTokenResponseSchema>;
+
 export const handleOAuthFlowBodySchema = z.union([
   z.object({ code: z.string(), state: z.string() }),
   z.object({ error: z.string(), state: z.string() }),
