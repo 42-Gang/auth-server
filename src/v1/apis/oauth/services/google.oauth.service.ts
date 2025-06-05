@@ -56,7 +56,11 @@ export default class GoogleOauthService implements OAuthService {
   }
 
   private createOAuthClient() {
-    return new google.auth.OAuth2(this.googleClientId, this.googleClientSecret, this.googleRedirectUrl);
+    return new google.auth.OAuth2(
+      this.googleClientId,
+      this.googleClientSecret,
+      this.googleRedirectUrl,
+    );
   }
 
   async handleCallback({
