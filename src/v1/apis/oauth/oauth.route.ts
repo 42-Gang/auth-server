@@ -2,10 +2,10 @@ import { FastifyInstance } from 'fastify';
 import { addRoutes, Route } from '../../../plugins/router.js';
 import OAuthController from './oauth.controller.js';
 import {
-  oAuthProviderSchema,
-  handleOAuthRequestSchema,
-  handleOAuthResponseSchema,
-} from './oauth.schema.js';
+  handleOAuthFlowBodySchema,
+  handleOAuthFlowResponseSchema,
+} from './schema/handle-oauth-flow.schema.js';
+import { oauthProviderParamSchema } from './schema/oauth.schema.js';
 
 export default async function oauthRoutes(fastify: FastifyInstance) {
   const oauthController: OAuthController = fastify.diContainer.resolve('oauthController');
@@ -19,9 +19,9 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         schema: {
           tags: ['oauth'],
           description: 'OAuth 시작',
-          params: oAuthProviderSchema,
+          params: oauthProviderParamSchema,
           response: {
-            302: { type: 'null' }, // Redirect는 응답 본문이 없으므로 null로 설정
+            302: { type: 'null' },
           },
         },
         auth: false,
@@ -35,10 +35,10 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
         schema: {
           tags: ['oauth'],
           description: 'OAuth 인증 후 회원가입 또는 로그인 처리',
-          params: oAuthProviderSchema,
-          body: handleOAuthRequestSchema,
+          params: oauthProviderParamSchema,
+          body: handleOAuthFlowBodySchema,
           response: {
-            201: handleOAuthResponseSchema,
+            201: handleOAuthFlowResponseSchema,
           },
         },
         auth: false,
