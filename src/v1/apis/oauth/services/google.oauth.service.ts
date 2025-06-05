@@ -47,13 +47,11 @@ export default class GoogleOauthService implements OAuthService {
       process.env.REDIRECT_URI,
     );
 
-    const authorizationUrl = oAuthClient.generateAuthUrl({
+    return oAuthClient.generateAuthUrl({
       access_type: 'online',
       scope: scopes,
       state: state,
     });
-
-    return authorizationUrl;
   }
 
   private async getCredentials(code: string, client: OAuth2Client): Promise<OAuthCredentials> {
