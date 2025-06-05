@@ -2,8 +2,10 @@ import { FastifyInstance } from 'fastify';
 import { addRoutes, Route } from '../../../plugins/router.js';
 import OAuthController from './oauth.controller.js';
 import { oauthProviderParamSchema } from './schema/oauth.schema.js';
-import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
-import { handleCallbackResponseSchema } from './services/oauth.service.js';
+import {
+  handleCallbackBodySchema,
+  handleCallbackResponseSchema,
+} from './schema/handle-callback.schema.js';
 
 export default async function oauthRoutes(fastify: FastifyInstance) {
   const oauthController: OAuthController = fastify.diContainer.resolve('oauthController');

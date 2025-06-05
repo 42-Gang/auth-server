@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyBaseLogger, FastifyReply, FastifyRequest } from 'fastify';
 import { BadRequestException } from '../../common/exceptions/core.error.js';
 import { STATUS } from '../../common/constants/status.js';
 import { OAuthService } from './services/oauth.service.js';
@@ -6,7 +6,10 @@ import { oauthProviderParamSchema } from './schema/oauth.schema.js';
 import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
 
 export default class OAuthController {
-  constructor(private readonly googleOauthService: OAuthService) {}
+  constructor(
+    private readonly googleOauthService: OAuthService,
+    private readonly logger: FastifyBaseLogger,
+  ) {}
 
   private getOAuthService(provider: string): OAuthService {
     if (provider === this.googleOauthService.provider) {
@@ -28,6 +31,7 @@ export default class OAuthController {
     const params = oauthProviderParamSchema.parse(request.params);
 
     const service = this.getOAuthService(params.provider);
+    this.logger.info(body, 'OAuth handleCallback body');
     const { accessToken, refreshToken, refreshTokenExpiresAt } = await service.handleCallback(body);
 
     reply.setCookie('refreshToken', refreshToken, {
