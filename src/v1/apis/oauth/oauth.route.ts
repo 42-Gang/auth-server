@@ -1,11 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import { addRoutes, Route } from '../../../plugins/router.js';
 import OAuthController from './oauth.controller.js';
-import {
-  handleOAuthFlowBodySchema,
-  handleOAuthFlowResponseSchema,
-} from './schema/handle-oauth-flow.schema.js';
 import { oauthProviderParamSchema } from './schema/oauth.schema.js';
+import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
+import { handleCallbackResponseSchema } from './services/oauth.service.js';
 
 export default async function oauthRoutes(fastify: FastifyInstance) {
   const oauthController: OAuthController = fastify.diContainer.resolve('oauthController');
@@ -36,9 +34,9 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
           tags: ['oauth'],
           description: 'OAuth 인증 후 회원가입 또는 로그인 처리',
           params: oauthProviderParamSchema,
-          body: handleOAuthFlowBodySchema,
+          body: handleCallbackBodySchema,
           response: {
-            201: handleOAuthFlowResponseSchema,
+            201: handleCallbackResponseSchema,
           },
         },
         auth: false,
