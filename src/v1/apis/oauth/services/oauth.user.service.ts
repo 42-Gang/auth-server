@@ -1,5 +1,5 @@
 import { GotClient } from '../../../../plugins/http.client.js';
-import { OAuthUserInputType } from '../oauth.schema.js';
+import { OAuthUserInputType } from '../schema/oauth.schema.js';
 import { HttpException } from '../../../common/exceptions/core.error.js';
 
 export default class OAuthUserService {
