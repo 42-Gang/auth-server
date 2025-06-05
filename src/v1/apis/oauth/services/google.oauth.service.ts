@@ -19,8 +19,6 @@ import OAuthUserService from './oauth.user.service.js';
 import { FastifyBaseLogger } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
-
 const oAuthScopes = [
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',
@@ -33,6 +31,9 @@ export default class GoogleOauthService implements OAuthService {
     private readonly tokenService: TokenService,
     private readonly oauthUserService: OAuthUserService,
     private readonly logger: FastifyBaseLogger,
+    private readonly googleClientId: string,
+    private readonly googleClientSecret: string,
+    private readonly redirectUrl: string,
   ) {}
 
   async getAuthorizationUrl(): Promise<string> {
@@ -42,9 +43,9 @@ export default class GoogleOauthService implements OAuthService {
     this.oauthCacheRepository.setState(`oauth:state:${state}`, { provider: 'google' }, 300);
 
     const oAuthClient = new google.auth.OAuth2(
-      GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET,
-      process.env.REDIRECT_URI,
+      this.googleClientId,
+      this.googleClientSecret,
+      this.redirectUrl,
     );
 
     return oAuthClient.generateAuthUrl({
@@ -145,9 +146,9 @@ export default class GoogleOauthService implements OAuthService {
     }
 
     const oAuthClient = new google.auth.OAuth2(
-      GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET,
-      process.env.REDIRECT_URI,
+      this.googleClientId,
+      this.googleClientSecret,
+      this.redirectUrl,
     );
     await this.checkOAuthState(state);
     const credentials = await this.getCredentials(code, oAuthClient);
