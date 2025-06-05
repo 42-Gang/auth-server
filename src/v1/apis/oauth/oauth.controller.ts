@@ -1,34 +1,36 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { oAuthProviderSchema, handleOAuthRequestSchema } from './oauth.schema.js';
 import { BadRequestException } from '../../common/exceptions/core.error.js';
-import GoogleOauthService from './services/google-oauth.service.js';
 import { STATUS } from '../../common/constants/status.js';
+import { OAuthService } from './services/oauth.service.js';
+import { oauthProviderParamSchema } from './schema/oauth.schema.js';
+import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
 
 export default class OAuthController {
-  constructor(private readonly googleOauthService: GoogleOauthService) {}
+  constructor(private readonly oauthServices: OAuthService[]) {}
 
-  private getOAuthService(provider: string) {
-    switch (provider) {
-      case 'google':
-        return this.googleOauthService;
-      default:
-        throw new BadRequestException('지원하지 않는 OAuth 제공자입니다.');
+  private getOAuthService(provider: string): OAuthService {
+    for (const service of this.oauthServices) {
+      if (service.provider === provider) {
+        return service;
+      }
     }
+    throw new BadRequestException('Not supported OAuth provider');
   }
 
-  getAuthorizationUrl = async (request: FastifyRequest, reply: FastifyReply) => {
-    const params = oAuthProviderSchema.parse(request.params);
-    const oAuthService = this.getOAuthService(params.provider);
-    const oAuthUrl = await oAuthService.getAuthorizationUrl();
-    reply.code(302).redirect(oAuthUrl);
+  getLoginUrl = async (request: FastifyRequest, reply: FastifyReply) => {
+    const params = oauthProviderParamSchema.parse(request.params);
+
+    const service = this.getOAuthService(params.provider);
+    const url = await service.getLoginUrl();
+    reply.code(302).redirect(url);
   };
 
-  handleOAuthFlow = async (request: FastifyRequest, reply: FastifyReply) => {
-    const body = handleOAuthRequestSchema.parse(request.body);
-    const provider = oAuthProviderSchema.parse(request.params).provider;
-    const oAuthService = this.getOAuthService(provider);
-    const { accessToken, refreshToken, refreshTokenExpiresAt } =
-      await oAuthService.handleOAuthFlow(body);
+  handleCallback = async (request: FastifyRequest, reply: FastifyReply) => {
+    const body = handleCallbackBodySchema.parse(request.body);
+    const params = oauthProviderParamSchema.parse(request.params);
+
+    const service = this.getOAuthService(params.provider);
+    const { accessToken, refreshToken, refreshTokenExpiresAt } = await service.handleCallback(body);
 
     reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,

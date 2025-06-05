@@ -14,7 +14,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
     {
       method: 'GET',
       url: '/:provider',
-      handler: oauthController.getAuthorizationUrl,
+      handler: oauthController.getLoginUrl,
       options: {
         schema: {
           tags: ['oauth'],
@@ -30,7 +30,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
     {
       method: 'POST',
       url: '/:provider/token',
-      handler: oauthController.handleOAuthFlow,
+      handler: oauthController.handleCallback,
       options: {
         schema: {
           tags: ['oauth'],

@@ -12,7 +12,6 @@ import {
   UnAuthorizedException,
 } from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
-import { FastifyBaseLogger } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
 import OAuthCacheRepository from '../../../storage/cache/oauth.cache.repository.js';
 import {
@@ -29,7 +28,6 @@ export default class GoogleOauthService implements OAuthService {
     private readonly oauthCacheRepository: OAuthCacheRepository,
     private readonly tokenService: TokenService,
     private readonly oauthUserService: OAuthUserService,
-    private readonly logger: FastifyBaseLogger,
     private readonly googleClientId: string,
     private readonly googleClientSecret: string,
     private readonly redirectUrl: string,
