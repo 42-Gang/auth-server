@@ -21,7 +21,7 @@ import {
   OAuthUserInfoType,
 } from '../schema/oauth.schema.js';
 import * as crypto from 'node:crypto';
-import { OAuthTokenResponseType } from '../schema/handle-oauth-flow.schema.js';
+import { OAuthTokenResponseType } from '../schema/handle-callback.schema.js';
 
 export default class GoogleOauthService implements OAuthService {
   constructor(
