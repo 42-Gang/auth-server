@@ -1,6 +1,6 @@
 import { TypeOf, z } from 'zod';
 
-export const oauthProviderSchema = z.enum(['google', 'kakao', 'naver']);
+export const oauthProviderSchema = z.enum(['GOOGLE', 'KAKAO', 'NAVER']);
 export type OAuthProviderType = TypeOf<typeof oauthProviderSchema>;
 
 export const oauthProviderParamSchema = z.object({
@@ -11,7 +11,7 @@ export const OAuthUserInfoSchema = z.object({
   id: z.string(),
   email: z.string(),
   name: z.string(),
-}); //google 한정
+});
 
 export type OAuthUserInfoType = TypeOf<typeof OAuthUserInfoSchema>;
 
