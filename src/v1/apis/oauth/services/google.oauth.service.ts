@@ -30,7 +30,7 @@ export default class GoogleOauthService implements OAuthService {
     private readonly oauthUserService: OAuthUserService,
     private readonly googleClientId: string,
     private readonly googleClientSecret: string,
-    private readonly redirectUrl: string,
+    private readonly googleRedirectUrl: string,
   ) {}
 
   readonly provider = oauthProviderSchema.enum.GOOGLE;
@@ -56,7 +56,7 @@ export default class GoogleOauthService implements OAuthService {
   }
 
   private createOAuthClient() {
-    return new google.auth.OAuth2(this.googleClientId, this.googleClientSecret, this.redirectUrl);
+    return new google.auth.OAuth2(this.googleClientId, this.googleClientSecret, this.googleRedirectUrl);
   }
 
   async handleCallback({

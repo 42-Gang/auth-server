@@ -40,6 +40,11 @@ export async function setDiContainer(server: FastifyInstance) {
       lifetime: Lifetime.SINGLETON,
     }),
   });
+  diContainer.register({
+    googleClientId: asValue(process.env.GOOGLE_CLIENT_ID),
+    googleClientSecret: asValue(process.env.GOOGLE_CLIENT_SECRET),
+    googleRedirectUrl: asValue(process.env.GOOGLE_REDIRECT_URI),
+  });
 
   const NODE_EXTENSION = process.env.NODE_ENV == 'dev' ? 'ts' : 'js';
   await diContainer.loadModules(

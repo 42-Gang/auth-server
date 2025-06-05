@@ -6,13 +6,11 @@ import { oauthProviderParamSchema } from './schema/oauth.schema.js';
 import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
 
 export default class OAuthController {
-  constructor(private readonly oauthServices: OAuthService[]) {}
+  constructor(private readonly googleOauthService: OAuthService) {}
 
   private getOAuthService(provider: string): OAuthService {
-    for (const service of this.oauthServices) {
-      if (service.provider === provider) {
-        return service;
-      }
+    if (provider === this.googleOauthService.provider) {
+      return this.googleOauthService;
     }
     throw new BadRequestException('Not supported OAuth provider');
   }
