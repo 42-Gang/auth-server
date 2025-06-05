@@ -1,6 +1,7 @@
 import { TypeOf, z } from 'zod';
 
 export const oauthProviderSchema = z.enum(['google', 'kakao', 'naver']);
+export type OAuthProviderType = TypeOf<typeof oauthProviderSchema>;
 
 export const oauthProviderParamSchema = z.object({
   provider: oauthProviderSchema,
