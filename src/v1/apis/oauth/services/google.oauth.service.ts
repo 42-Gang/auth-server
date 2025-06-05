@@ -11,7 +11,10 @@ import {
 } from '../oauth.schema.js';
 import { OAuthProvider } from '@prisma/client';
 import crypto from 'crypto';
-import { BadRequestException, UnAuthorizedException } from '../../../common/exceptions/core.error.js';
+import {
+  BadRequestException,
+  UnAuthorizedException,
+} from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
 import { FastifyBaseLogger } from 'fastify';
 import { OAuth2Client } from 'google-auth-library';
@@ -37,13 +40,13 @@ export default class GoogleOauthService implements OAuthService {
     const scopes = oAuthScopes;
 
     this.oauthCacheRepository.setState(`oauth:state:${state}`, { provider: 'google' }, 300);
-    
+
     const oAuthClient = new google.auth.OAuth2(
       GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET,
       process.env.REDIRECT_URI,
     );
-    
+
     const authorizationUrl = oAuthClient.generateAuthUrl({
       access_type: 'online',
       scope: scopes,
@@ -66,7 +69,10 @@ export default class GoogleOauthService implements OAuthService {
     };
   }
 
-  private async getUserInfo(tokens: OAuthCredentials, client: OAuth2Client): Promise<OAuthUserInfoType> {
+  private async getUserInfo(
+    tokens: OAuthCredentials,
+    client: OAuth2Client,
+  ): Promise<OAuthUserInfoType> {
     oAuthScopes.forEach((scope) => {
       if (!tokens.scope?.includes(scope)) {
         throw new UnAuthorizedException(
@@ -148,10 +154,13 @@ export default class GoogleOauthService implements OAuthService {
     await this.checkOAuthState(state);
     const credentials = await this.getCredentials(code, oAuthClient);
 
-    const userInfo = await this.getUserInfo({
-      accessToken: credentials.accessToken,
-      scope: credentials.scope,
-    }, oAuthClient);
+    const userInfo = await this.getUserInfo(
+      {
+        accessToken: credentials.accessToken,
+        scope: credentials.scope,
+      },
+      oAuthClient,
+    );
 
     const userId = await this.checkOAuthUserExists(userInfo);
     if (userId) {
