@@ -22,7 +22,7 @@ export default class OAuthController {
     const params = oauthProviderParamSchema.parse(request.params);
 
     const service = this.getOAuthService(params.provider);
-    const url = await service.getLoginUrl();
+    const url = await service.getAuthUrl();
     reply.code(302).redirect(url);
   };
 
