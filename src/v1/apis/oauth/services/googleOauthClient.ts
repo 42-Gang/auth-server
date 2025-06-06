@@ -39,9 +39,6 @@ export default class GoogleOauthClient {
   }
 
   public getClient() {
-    console.log(`googleClientId: ${this.googleClientId}`);
-    console.log(`googleClientSecret: ${this.googleClientSecret}`);
-    console.log(`googleRedirectUrl: ${this.googleRedirectUrl}`);
     return new google.auth.OAuth2(
       this.googleClientId,
       this.googleClientSecret,
