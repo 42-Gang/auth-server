@@ -28,6 +28,9 @@ export default class OAuthController {
 
   handleCallback = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = handleCallbackBodySchema.parse(request.body);
+    if ('error' in body) {
+      throw new BadRequestException(`Google errer : ${body.error}`);
+    }
     const params = oauthProviderParamSchema.parse(request.params);
 
     const service = this.getOAuthService(params.provider);
