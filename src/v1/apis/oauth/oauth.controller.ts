@@ -15,7 +15,7 @@ export default class OAuthController {
     if (provider === this.googleOauthService.provider) {
       return this.googleOauthService;
     }
-    throw new BadRequestException('Not supported OAuth provider');
+    throw new BadRequestException('Not supported OAuth provider ${provider}');
   }
 
   getLoginUrl = async (request: FastifyRequest, reply: FastifyReply) => {
