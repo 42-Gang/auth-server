@@ -56,7 +56,9 @@ export default class GoogleOauthService implements OAuthService {
   private async validateState(state: string): Promise<void> {
     const exists = await this.oauthCacheRepository.isExistsState(this.provider, state);
     if (!exists) {
-      throw new UnAuthorizedException(`유효하지 않은 또는 만료된 state 파라미터입니다. ${this.provider}`);
+      throw new UnAuthorizedException(
+        `유효하지 않은 또는 만료된 state 파라미터입니다. ${this.provider}`,
+      );
     }
   }
 
@@ -97,7 +99,9 @@ export default class GoogleOauthService implements OAuthService {
       nickname: userInfo.name,
     });
     if (!newUser) {
-      throw new BadRequestException('사용자 서비스에서 사용자 생성에 실패했습니다. 다시 시도해주세요.');
+      throw new BadRequestException(
+        '사용자 서비스에서 사용자 생성에 실패했습니다. 다시 시도해주세요.',
+      );
     }
 
     await this.oauthRepository.create({
