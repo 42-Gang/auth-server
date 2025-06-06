@@ -60,13 +60,13 @@ export default class GoogleOauthClient {
 
   public validateTokens(tokens: Credentials) {
     const { access_token, scope } = tokens;
-    if (!access_token) {
-      throw new BadRequestException('구글 OAuth 인증에 실패했습니다. 다시 시도해주세요.');
-    }
     if (!scope) {
       throw new BadRequestException('구글 OAuth 인증에 실패했습니다. scope가 없습니다.');
     }
     this.validateScopes(scope.split(' '));
+    if (!access_token) {
+      throw new BadRequestException('구글 OAuth 인증에 실패했습니다. 다시 시도해주세요.');
+    }
   }
 
   public async getUserInfo(client: OAuth2Client) {

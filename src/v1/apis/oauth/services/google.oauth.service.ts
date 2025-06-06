@@ -56,7 +56,7 @@ export default class GoogleOauthService implements OAuthService {
   private async validateState(state: string): Promise<void> {
     const exists = await this.oauthCacheRepository.isExistsState(this.provider, state);
     if (!exists) {
-      throw new UnAuthorizedException('유효하지 않은 또는 만료된 state 파라미터입니다.');
+      throw new UnAuthorizedException(`유효하지 않은 또는 만료된 state 파라미터입니다. ${this.provider}`);
     }
   }
 
