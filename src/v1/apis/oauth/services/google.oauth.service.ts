@@ -97,7 +97,7 @@ export default class GoogleOauthService implements OAuthService {
       nickname: userInfo.name,
     });
     if (!newUser) {
-      throw new BadRequestException('사용자 생성에 실패했습니다. 다시 시도해주세요.');
+      throw new BadRequestException('사용자 서비스에서 사용자 생성에 실패했습니다. 다시 시도해주세요.');
     }
 
     await this.oauthRepository.create({
