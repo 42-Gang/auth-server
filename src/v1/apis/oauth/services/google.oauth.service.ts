@@ -66,34 +66,34 @@ export default class GoogleOauthService implements OAuthService {
   }
 
   private async fetchUserInfo(client: OAuth2Client): Promise<OAuthUserInfoType> {
-    const rawUserInfo = await this.googleOauthClient.getUserInfo(client);
-    return OAuthUserInfoSchema.parse(rawUserInfo);
+    const googleUserData = await this.googleOauthClient.getUserInfo(client);
+    return OAuthUserInfoSchema.parse(googleUserData);
   }
 
   private async findOrCreateUserRecord(userInfo: OAuthUserInfoType): Promise<number> {
-    const existingOauth = await this.oauthRepository.findByProviderAndProviderId(
+    const userFromOauth = await this.oauthRepository.findByProviderAndProviderId(
       this.provider,
       userInfo.id,
     );
-    if (existingOauth) {
-      return existingOauth.userId;
+    if (userFromOauth) {
+      return userFromOauth.userId;
     }
 
-    const maybeUser = await this.oauthUserService.getOAuthUserByEmail({
+    const userFromNative = await this.oauthUserService.getOAuthUserByEmail({
       email: userInfo.email,
       nickname: userInfo.name,
-    });//TODO maybeUser 바꾸기
+    });
 
-    if (maybeUser.exists && maybeUser.userId) {
+    if (userFromNative.exists && userFromNative.userId) {
       await this.oauthRepository.create({
         provider: this.provider,
         providerUserId: userInfo.id,
-        userId: maybeUser.userId,
+        userId: userFromNative.userId,
       });
-      return maybeUser.userId;
+      return userFromNative.userId;
     }
 
-    const newUser = await this.oauthUserService.createOAuthUser({
+    const userCreated = await this.oauthUserService.createOAuthUser({
       email: userInfo.email,
       nickname: userInfo.name,
     });
@@ -101,9 +101,9 @@ export default class GoogleOauthService implements OAuthService {
     await this.oauthRepository.create({
       provider: this.provider,
       providerUserId: userInfo.id,
-      userId: newUser.userId,
+      userId: userCreated.userId,
     });
-    return newUser.userId;
+    return userCreated.userId;
   }
 
   private async generateAccessToken(userId: number): Promise<OAuthTokenResponseType> {
