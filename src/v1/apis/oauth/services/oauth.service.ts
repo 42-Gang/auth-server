@@ -1,5 +1,4 @@
 import { TypeOf, z } from 'zod';
-import { HandleCallbackBodyType } from '../schema/handle-callback.schema.js';
 
 export interface OAuthCredentials {
   accessToken: string;
@@ -26,5 +25,5 @@ export interface OAuthService {
 
   getAuthUrl(): Promise<string>;
 
-  handleCallback(input: HandleCallbackBodyType): Promise<HandleCallbackResponseType>;
+  handleCallback(input: HandleCallbackInputType): Promise<HandleCallbackResponseType>;
 }

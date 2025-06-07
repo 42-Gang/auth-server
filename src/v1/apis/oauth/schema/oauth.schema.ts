@@ -4,7 +4,10 @@ export const oauthProviderSchema = z.enum(['GOOGLE', 'KAKAO', 'NAVER']);
 export type OAuthProviderType = TypeOf<typeof oauthProviderSchema>;
 
 export const oauthProviderParamSchema = z.object({
-  provider: oauthProviderSchema,
+  provider: z.preprocess(
+    (val) => typeof val === "string" ? val.toUpperCase() : val,
+    oauthProviderSchema
+  ),
 });
 
 export const OAuthUserInfoSchema = z.object({

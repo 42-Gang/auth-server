@@ -6,7 +6,6 @@ import {
 } from './oauth.service.js';
 import TokenService from '../../auth/services/token.service.js';
 import {
-  BadRequestException,
   UnAuthorizedException,
 } from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
@@ -83,7 +82,7 @@ export default class GoogleOauthService implements OAuthService {
     const maybeUser = await this.oauthUserService.getOAuthUserByEmail({
       email: userInfo.email,
       nickname: userInfo.name,
-    });
+    });//TODO maybeUser 바꾸기
 
     if (maybeUser.exists && maybeUser.userId) {
       await this.oauthRepository.create({
@@ -98,11 +97,6 @@ export default class GoogleOauthService implements OAuthService {
       email: userInfo.email,
       nickname: userInfo.name,
     });
-    if (!newUser) {
-      throw new BadRequestException(
-        '사용자 서비스에서 사용자 생성에 실패했습니다. 다시 시도해주세요.',
-      );
-    }
 
     await this.oauthRepository.create({
       provider: this.provider,

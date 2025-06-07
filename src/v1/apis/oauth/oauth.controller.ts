@@ -1,9 +1,8 @@
 import { FastifyBaseLogger, FastifyReply, FastifyRequest } from 'fastify';
 import { BadRequestException } from '../../common/exceptions/core.error.js';
 import { STATUS } from '../../common/constants/status.js';
-import { OAuthService } from './services/oauth.service.js';
+import { handleCallbackInputSchema, OAuthService } from './services/oauth.service.js';
 import { oauthProviderParamSchema } from './schema/oauth.schema.js';
-import { handleCallbackBodySchema } from './schema/handle-callback.schema.js';
 
 export default class OAuthController {
   constructor(
@@ -27,10 +26,7 @@ export default class OAuthController {
   };
 
   handleCallback = async (request: FastifyRequest, reply: FastifyReply) => {
-    const body = handleCallbackBodySchema.parse(request.body);
-    if ('error' in body) {
-      throw new BadRequestException(`Google errer : ${body.error}`);
-    }
+    const body = handleCallbackInputSchema.parse(request.body);
     const params = oauthProviderParamSchema.parse(request.params);
 
     const service = this.getOAuthService(params.provider);

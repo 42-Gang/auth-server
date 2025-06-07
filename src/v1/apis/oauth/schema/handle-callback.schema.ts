@@ -14,10 +14,3 @@ export const oauthTokenResponseSchema = z.object({
 });
 
 export type OAuthTokenResponseType = z.infer<typeof oauthTokenResponseSchema>;
-
-export const handleCallbackBodySchema = z.union([
-  z.object({ code: z.string(), state: z.string() }),
-  z.object({ error: z.string(), state: z.string() }),
-]);
-
-export type HandleCallbackBodyType = z.infer<typeof handleCallbackBodySchema>;

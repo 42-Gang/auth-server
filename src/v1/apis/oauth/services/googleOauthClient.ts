@@ -18,6 +18,9 @@ export default class GoogleOauthClient {
     private readonly googleRedirectUrl: string,
   ) {
     if (!googleClientId || !googleClientSecret || !googleRedirectUrl) {
+      console.log(googleClientId);
+      console.log(googleClientSecret);
+      console.log(googleRedirectUrl);
       throw new BadRequestException('구글 OAuth 클라이언트 설정이 올바르지 않습니다.');
     }
   }
