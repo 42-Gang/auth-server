@@ -15,8 +15,8 @@ export default class OAuthCacheRepository {
     await this.redisClient.set(key, 'true', 'EX', this.TTL); // 5 minutes TTL
   }
 
-  async isExistsState(provider: OAuthProviderType, state: string): Promise<boolean> {
+  async isExistsState(provider: OAuthProviderType, state: string): Promise<string | null> {
     const key = this.getStateKey(provider, state);
-    return (await this.redisClient.exists(key)) === 1;
+    return await this.redisClient.getdel(key);
   }
 }
