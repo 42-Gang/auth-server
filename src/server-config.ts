@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import { connectKafkaProducer } from './plugins/kafka.js';
 import { fastifyCookie } from '@fastify/cookie';
 import { startMailConsumer } from './mail/mail.consumer.js';
+import fastifyCors from '@fastify/cors';
 
 export async function configureServer(server: FastifyInstance) {
   server.setValidatorCompiler(validatorCompiler); // Fastify 유효성 검사기 설정
@@ -17,6 +18,10 @@ export async function configureServer(server: FastifyInstance) {
 }
 
 export async function registerPlugins(server: FastifyInstance) {
+  await server.register(fastifyCors, {
+    origin: process.env.FRONT_URL,
+    credentials: true,
+  });
   await server.register(fastifyCookie);
   await registerRedisPlugin(server); // Redis 플러그인 등록
   await setDiContainer(server); // 의존성 주입 컨테이너 설정

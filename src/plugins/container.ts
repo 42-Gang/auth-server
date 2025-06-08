@@ -7,6 +7,7 @@ import TokenGenerator from '../v1/apis/auth/TokenGenerator.js';
 import jwt from 'jsonwebtoken';
 import { JwtModule } from './jwt.module.js';
 import { jwtConfig } from '../config.js';
+import GoogleOauthClient from '../v1/apis/oauth/services/googleOauthClient.js';
 
 export async function setDiContainer(server: FastifyInstance) {
   server.register(fastifyAwilixPlugin, {
@@ -36,6 +37,15 @@ export async function setDiContainer(server: FastifyInstance) {
       lifetime: Lifetime.SINGLETON,
     }),
     tokenGenerator: asClass(TokenGenerator, {
+      injectionMode: 'CLASSIC',
+      lifetime: Lifetime.SINGLETON,
+    }),
+  });
+  diContainer.register({
+    googleClientId: asValue(process.env.GOOGLE_CLIENT_ID),
+    googleClientSecret: asValue(process.env.GOOGLE_CLIENT_SECRET),
+    googleRedirectUrl: asValue(process.env.GOOGLE_REDIRECT_URI),
+    googleOauthClient: asClass(GoogleOauthClient, {
       injectionMode: 'CLASSIC',
       lifetime: Lifetime.SINGLETON,
     }),
