@@ -5,9 +5,7 @@ import {
   OAuthService,
 } from './oauth.service.js';
 import TokenService from '../../auth/services/token.service.js';
-import {
-  UnAuthorizedException,
-} from '../../../common/exceptions/core.error.js';
+import { UnAuthorizedException } from '../../../common/exceptions/core.error.js';
 import OAuthUserService from './oauth.user.service.js';
 import OAuthCacheRepository from '../../../storage/cache/oauth.cache.repository.js';
 import {

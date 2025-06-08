@@ -5,8 +5,8 @@ export type OAuthProviderType = TypeOf<typeof oauthProviderSchema>;
 
 export const oauthProviderParamSchema = z.object({
   provider: z.preprocess(
-    (val) => typeof val === "string" ? val.toUpperCase() : val,
-    oauthProviderSchema
+    (val) => (typeof val === 'string' ? val.toUpperCase() : val),
+    oauthProviderSchema,
   ),
 });
 
