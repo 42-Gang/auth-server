@@ -34,6 +34,8 @@ model UserOAuth {
   userId         Int            @map("user_id")
   provider       OAuthProvider  
   providerUserId String         @map("provider_user_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@unique([provider, providerUserId])
   @@map("user_oauth")
