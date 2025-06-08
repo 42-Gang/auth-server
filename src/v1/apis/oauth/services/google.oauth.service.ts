@@ -19,6 +19,8 @@ import GoogleOauthClient from './googleOauthClient.js';
 import { OAuth2Client } from 'google-auth-library';
 
 export default class GoogleOauthService implements OAuthService {
+  readonly provider = oauthProviderSchema.enum.GOOGLE;
+
   constructor(
     private readonly oauthRepository: OAuthRepositoryInterface,
     private readonly oauthCacheRepository: OAuthCacheRepository,
@@ -26,8 +28,6 @@ export default class GoogleOauthService implements OAuthService {
     private readonly oauthUserService: OAuthUserService,
     private readonly googleOauthClient: GoogleOauthClient,
   ) {}
-
-  readonly provider = oauthProviderSchema.enum.GOOGLE;
 
   async getAuthUrl(): Promise<string> {
     const state = crypto.randomBytes(16).toString('hex');
