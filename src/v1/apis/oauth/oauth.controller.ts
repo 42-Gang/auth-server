@@ -2,7 +2,7 @@ import { FastifyBaseLogger, FastifyReply, FastifyRequest } from 'fastify';
 import { BadRequestException } from '../../common/exceptions/core.error.js';
 import { STATUS } from '../../common/constants/status.js';
 import { handleCallbackInputSchema, OAuthService } from './services/oauth.service.js';
-import { oauthProviderParamSchema } from './schema/oauth.schema.js';
+import { oauthRedirectUriBodySchema, oauthProviderParamSchema } from './schema/oauth.schema.js';
 
 export default class OAuthController {
   constructor(
@@ -19,9 +19,10 @@ export default class OAuthController {
 
   getLoginUrl = async (request: FastifyRequest, reply: FastifyReply) => {
     const params = oauthProviderParamSchema.parse(request.params);
+    const body = oauthRedirectUriBodySchema.parse(request.body);
 
     const service = this.getOAuthService(params.provider);
-    const url = await service.getAuthUrl();
+    const url = await service.getAuthUrl(body.redirectUri);
     reply.code(302).redirect(url);
   };
 
@@ -36,9 +37,10 @@ export default class OAuthController {
     reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       expires: refreshTokenExpiresAt,
     });
+
     reply.status(201).send({
       status: STATUS.SUCCESS,
       message: '액세스 토큰이 성공적으로 갱신되었습니다.',

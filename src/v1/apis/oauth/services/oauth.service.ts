@@ -23,7 +23,7 @@ export type HandleCallbackInputType = TypeOf<typeof handleCallbackInputSchema>;
 export interface OAuthService {
   readonly provider: string;
 
-  getAuthUrl(): Promise<string>;
+  getAuthUrl(redirectUri: string): Promise<string>;
 
   handleCallback(input: HandleCallbackInputType): Promise<HandleCallbackResponseType>;
 }
