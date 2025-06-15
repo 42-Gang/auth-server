@@ -21,8 +21,6 @@ export default class OAuthController {
     const params = oauthProviderParamSchema.parse(request.params);
     const query = oauthRedirectUriQuerySchema.parse(request.query);
 
-    this.logger.info(query);
-
     const service = this.getOAuthService(params.provider);
     const url = await service.getAuthUrl(query.redirectUri);
     reply.code(302).redirect(url);
