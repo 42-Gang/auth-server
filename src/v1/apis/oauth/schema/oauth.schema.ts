@@ -10,7 +10,7 @@ export const oauthProviderParamSchema = z.object({
   ),
 });
 
-export const oauthRedirectUriBodySchema = z.object({
+export const oauthRedirectUriQuerySchema = z.object({
   redirectUri: z.string(),
 });
 

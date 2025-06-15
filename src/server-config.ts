@@ -19,8 +19,8 @@ export async function configureServer(server: FastifyInstance) {
 
 export async function registerPlugins(server: FastifyInstance) {
   await server.register(fastifyCors, {
-    origin: process.env.FRONT_URL,
-    credentials: true,
+    origin: "*",
+    credentials: true, // 이 설정과 함께 쓸 경우 주의!
   });
   await server.register(fastifyCookie);
   await registerRedisPlugin(server); // Redis 플러그인 등록

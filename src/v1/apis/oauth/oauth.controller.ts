@@ -2,7 +2,7 @@ import { FastifyBaseLogger, FastifyReply, FastifyRequest } from 'fastify';
 import { BadRequestException } from '../../common/exceptions/core.error.js';
 import { STATUS } from '../../common/constants/status.js';
 import { handleCallbackInputSchema, OAuthService } from './services/oauth.service.js';
-import { oauthRedirectUriBodySchema, oauthProviderParamSchema } from './schema/oauth.schema.js';
+import { oauthRedirectUriQuerySchema, oauthProviderParamSchema } from './schema/oauth.schema.js';
 
 export default class OAuthController {
   constructor(
@@ -19,10 +19,12 @@ export default class OAuthController {
 
   getLoginUrl = async (request: FastifyRequest, reply: FastifyReply) => {
     const params = oauthProviderParamSchema.parse(request.params);
-    const body = oauthRedirectUriBodySchema.parse(request.body);
+    const query = oauthRedirectUriQuerySchema.parse(request.query);
+
+    this.logger.info(query);
 
     const service = this.getOAuthService(params.provider);
-    const url = await service.getAuthUrl(body.redirectUri);
+    const url = await service.getAuthUrl(query.redirectUri);
     reply.code(302).redirect(url);
   };
 
@@ -37,7 +39,7 @@ export default class OAuthController {
     reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       expires: refreshTokenExpiresAt,
     });
 
