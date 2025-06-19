@@ -41,7 +41,7 @@ export default class GoogleOauthClient {
     return new google.auth.OAuth2(
       this.googleClientId,
       this.googleClientSecret,
-      redirectUri ?? undefined
+      redirectUri
     );
   }
 
