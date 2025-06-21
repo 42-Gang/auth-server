@@ -38,11 +38,7 @@ export default class GoogleOauthClient {
   }
 
   public getClient(redirectUri: string) {
-    return new google.auth.OAuth2(
-      this.googleClientId,
-      this.googleClientSecret,
-      redirectUri
-    );
+    return new google.auth.OAuth2(this.googleClientId, this.googleClientSecret, redirectUri);
   }
 
   public async getTokens(client: OAuth2Client, code: string) {

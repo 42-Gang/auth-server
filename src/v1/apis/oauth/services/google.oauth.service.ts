@@ -39,7 +39,7 @@ export default class GoogleOauthService implements OAuthService {
   async handleCallback({
     code,
     state,
-    redirectUri
+    redirectUri,
   }: HandleCallbackInputType): Promise<HandleCallbackResponseType> {
     await this.validateState(state);
     const client = this.googleOauthClient.getClient(redirectUri);
