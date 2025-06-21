@@ -8,6 +8,7 @@ export interface OAuthCredentials {
 export const handleCallbackInputSchema = z.object({
   state: z.string(),
   code: z.string(),
+  redirectUri: z.string(),
 });
 
 export const handleCallbackResponseSchema = z.object({
@@ -23,7 +24,7 @@ export type HandleCallbackInputType = TypeOf<typeof handleCallbackInputSchema>;
 export interface OAuthService {
   readonly provider: string;
 
-  getAuthUrl(): Promise<string>;
+  getAuthUrl(redirectUri: string): Promise<string>;
 
   handleCallback(input: HandleCallbackInputType): Promise<HandleCallbackResponseType>;
 }

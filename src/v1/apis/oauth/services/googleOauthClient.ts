@@ -15,9 +15,8 @@ export default class GoogleOauthClient {
   constructor(
     private readonly googleClientId: string,
     private readonly googleClientSecret: string,
-    private readonly googleRedirectUrl: string,
   ) {
-    if (!googleClientId || !googleClientSecret || !googleRedirectUrl) {
+    if (!googleClientId || !googleClientSecret) {
       throw new BadRequestException('구글 OAuth 클라이언트 설정이 올바르지 않습니다.');
     }
   }
@@ -38,12 +37,8 @@ export default class GoogleOauthClient {
     }
   }
 
-  public getClient() {
-    return new google.auth.OAuth2(
-      this.googleClientId,
-      this.googleClientSecret,
-      this.googleRedirectUrl,
-    );
+  public getClient(redirectUri: string) {
+    return new google.auth.OAuth2(this.googleClientId, this.googleClientSecret, redirectUri);
   }
 
   public async getTokens(client: OAuth2Client, code: string) {

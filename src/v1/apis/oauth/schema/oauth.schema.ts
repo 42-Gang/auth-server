@@ -10,6 +10,10 @@ export const oauthProviderParamSchema = z.object({
   ),
 });
 
+export const oauthRedirectUriQuerySchema = z.object({
+  redirectUri: z.string(),
+});
+
 export const OAuthUserInfoSchema = z.object({
   id: z.string(),
   email: z.string(),

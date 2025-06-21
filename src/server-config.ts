@@ -19,7 +19,7 @@ export async function configureServer(server: FastifyInstance) {
 
 export async function registerPlugins(server: FastifyInstance) {
   await server.register(fastifyCors, {
-    origin: process.env.FRONT_URL,
+    origin: '*',
     credentials: true,
   });
   await server.register(fastifyCookie);

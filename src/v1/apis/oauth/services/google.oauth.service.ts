@@ -29,19 +29,21 @@ export default class GoogleOauthService implements OAuthService {
     private readonly googleOauthClient: GoogleOauthClient,
   ) {}
 
-  async getAuthUrl(): Promise<string> {
+  async getAuthUrl(redirectUri: string): Promise<string> {
     const state = crypto.randomBytes(16).toString('hex');
     await this.oauthCacheRepository.setState(this.provider, state);
-    const client = this.googleOauthClient.getClient();
+    const client = this.googleOauthClient.getClient(redirectUri);
     return this.googleOauthClient.generateAuthUrl(client, state);
   }
 
   async handleCallback({
     code,
     state,
+    redirectUri,
   }: HandleCallbackInputType): Promise<HandleCallbackResponseType> {
     await this.validateState(state);
-    const client = this.googleOauthClient.getClient();
+    const client = this.googleOauthClient.getClient(redirectUri);
+
     const googleTokens = await this.exchangeGoogleTokens(client, code);
     this.googleOauthClient.validateTokens(googleTokens);
     await this.googleOauthClient.setCredentials(client, googleTokens);

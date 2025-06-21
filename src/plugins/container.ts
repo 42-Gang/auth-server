@@ -44,7 +44,6 @@ export async function setDiContainer(server: FastifyInstance) {
   diContainer.register({
     googleClientId: asValue(process.env.GOOGLE_CLIENT_ID),
     googleClientSecret: asValue(process.env.GOOGLE_CLIENT_SECRET),
-    googleRedirectUrl: asValue(process.env.GOOGLE_REDIRECT_URI),
     googleOauthClient: asClass(GoogleOauthClient, {
       injectionMode: 'CLASSIC',
       lifetime: Lifetime.SINGLETON,

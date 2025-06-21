@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { addRoutes, Route } from '../../../plugins/router.js';
 import OAuthController from './oauth.controller.js';
-import { oauthProviderParamSchema } from './schema/oauth.schema.js';
+import { oauthRedirectUriQuerySchema, oauthProviderParamSchema } from './schema/oauth.schema.js';
 import { handleCallbackResponseSchema } from './schema/handle-callback.schema.js';
 import { handleCallbackInputSchema } from './services/oauth.service.js';
 
@@ -18,6 +18,7 @@ export default async function oauthRoutes(fastify: FastifyInstance) {
           tags: ['oauth'],
           description: 'OAuth 시작',
           params: oauthProviderParamSchema,
+          querystring: oauthRedirectUriQuerySchema,
           response: {
             302: { type: 'null' },
           },

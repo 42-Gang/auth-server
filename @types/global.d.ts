@@ -27,7 +27,6 @@ declare global {
 
       GMAIL_USER: string;
       GMAIL_APP_PASS: string;
-      REDIRECT_URI: string;
     }
   }
 }
