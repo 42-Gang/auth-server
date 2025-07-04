@@ -3,7 +3,11 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "./",
-    "baseUrl": "./",
+    "baseUrl": "./"
   },
-  "include": ["src/**/*.*", "src/**/*d.ts", "@types"],
+  "include": [
+    "src/**/*.*",
+    "src/**/*d.ts",
+    "@types"
+  ]
 }
