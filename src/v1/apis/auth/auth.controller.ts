@@ -20,6 +20,12 @@ export default class AuthController {
 
   healthCheck = async (request: FastifyRequest, reply: FastifyReply) => {
     this.logger.info('Health check endpoint hit');
+    const data = {
+      abc: '123',
+      def: '456',
+    };
+    this.logger.info(data, 'Health check info data');
+    this.logger.error(data, 'Health check error data');
     reply.status(200).send({
       status: STATUS.SUCCESS,
       message: 'Auth service is healthy',
