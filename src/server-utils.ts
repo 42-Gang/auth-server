@@ -16,7 +16,7 @@ export function getLoggerOptions() {
   return {
     level: process.env.NODE_ENV === 'dev' ? 'debug' : 'info',
     transport: {
-      target: process.env.NODE_ENV === 'dev' ? 'pino-pretty' : 'pino',
+      target: process.env.NODE_ENV === 'dev' ? 'pino-pretty' : 'pino/file',
       options: {
         translateTime: 'HH:MM:ss Z',
         ignore: 'pid,hostname',
