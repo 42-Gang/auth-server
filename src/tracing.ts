@@ -14,6 +14,11 @@ const prometheusExporter = new PrometheusExporter(
   },
 );
 
+if (!process.env.JAEGER_ENDPOINT) {
+  throw new Error('JAEGER_ENDPOINT environment variable is not set');
+}
+console.log(`Using Jaeger endpoint: ${process.env.JAEGER_ENDPOINT}`);
+
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
     url: process.env.JAEGER_ENDPOINT,
