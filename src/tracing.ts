@@ -14,7 +14,26 @@ const sdk = new NodeSDK({
     headers: {},
   }),
   serviceName: 'auth-service',
-  instrumentations: [getNodeAutoInstrumentations(), new PrismaInstrumentation()],
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      '@opentelemetry/instrumentation-kafkajs': {
+        enabled: true,
+        producerHook: (span, { topic, message }) =>
+          span.setAttributes({
+            'kafka.topic': topic,
+            'kafka.message.key': message.key ? message.key.toString() : undefined,
+            'kafka.message.value': message.value ? message.value.toString() : undefined,
+          }),
+        consumerHook: (span, { topic, message }) =>
+          span.setAttributes({
+            'kafka.topic': topic,
+            'kafka.message.key': message.key ? message.key.toString() : undefined,
+            'kafka.message.value': message.value ? message.value.toString() : undefined,
+          }),
+      },
+    }),
+    new PrismaInstrumentation(),
+  ],
 });
 
 sdk.start();
