@@ -41,6 +41,7 @@
     "@opentelemetry/sdk-metrics": "^2.0.1",
     "@opentelemetry/sdk-node": "^0.202.0",
     "@prisma/client": "^6.5.0",
+    "@prisma/instrumentation": "^6.13.0",
     "@types/uuid": "^10.0.0",
     "awilix": "^12.0.5",
     "c8": "^10.1.3",
