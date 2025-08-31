@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyBaseLogger, FastifyReply, FastifyRequest } from 'fastify';
 
 import { TypeOf } from 'zod';
 import { STATUS } from '../../common/constants/status.js';
@@ -15,7 +15,23 @@ export default class AuthController {
     private readonly authService: AuthService,
     private readonly mailVerificationService: MailVerificationService,
     private readonly tokenService: TokenService,
+    private readonly logger: FastifyBaseLogger,
   ) {}
+
+  healthCheck = async (request: FastifyRequest, reply: FastifyReply) => {
+    this.logger.info('Health check endpoint hit');
+    const data = {
+      abc: '123',
+      def: '456',
+    };
+    this.logger.info(data, 'Health check info data');
+    this.logger.error(data, 'Health check error data');
+    reply.status(200).send({
+      status: STATUS.SUCCESS,
+      message: 'Auth service is healthy',
+      data: null,
+    });
+  };
 
   signup = async (request: FastifyRequest, reply: FastifyReply) => {
     const body = signupInputSchema.parse(request.body);

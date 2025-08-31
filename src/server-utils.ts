@@ -13,9 +13,9 @@ export function createServer() {
 }
 
 export function getLoggerOptions() {
-  if (process.stdout.isTTY) {
+  if (process.env.NODE_ENV === 'dev') {
     return {
-      level: 'info',
+      level: 'debug',
       transport: {
         target: 'pino-pretty',
         options: {
@@ -25,7 +25,14 @@ export function getLoggerOptions() {
       },
     };
   }
-  return { level: process.env.FASTIFY_LOG_LEVEL || 'error' };
+
+  return {
+    level: process.env.LOG_LEVEL || 'error',
+    redact: {
+      paths: ['req.headers.authorization', 'req.headers.cookie', '*.password', '*.token'],
+      censor: '[Redacted]',
+    },
+  };
 }
 
 export async function startServer(server: FastifyInstance) {

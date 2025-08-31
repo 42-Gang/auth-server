@@ -107,7 +107,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
     {
       method: 'GET',
       url: '/health-check',
-      handler: () => 'hello world',
+      handler: authController.healthCheck,
       options: {
         auth: false,
       },
