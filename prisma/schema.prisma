@@ -22,6 +22,7 @@ model RefreshToken {
   updatedAt    DateTime           @updatedAt @map("updated_at")
 
   @@unique([refreshToken])
+  @@index([userId, status], name: "idx_refreshtoken_user_status")
   @@map("refresh_token")
 }
 
@@ -30,12 +31,12 @@ enum OAuthProvider {
 }
 
 model UserOAuth {
-  id             Int            @id @default(autoincrement())
-  userId         Int            @map("user_id")
-  provider       OAuthProvider  
-  providerUserId String         @map("provider_user_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id             Int           @id @default(autoincrement())
+  userId         Int           @map("user_id")
+  provider       OAuthProvider
+  providerUserId String        @map("provider_user_id")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   @@unique([provider, providerUserId])
   @@map("user_oauth")
