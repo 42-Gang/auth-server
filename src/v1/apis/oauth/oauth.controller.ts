@@ -38,7 +38,7 @@ export default class OAuthController {
       path: '/api/v1/auth',
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       expires: refreshTokenExpiresAt,
     });
 

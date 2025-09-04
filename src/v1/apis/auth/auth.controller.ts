@@ -47,9 +47,10 @@ export default class AuthController {
     );
 
     reply.setCookie('refreshToken', refreshToken, {
+      path: '/api/v1/auth',
       httpOnly: true,
       secure: true,
-      sameSite: 'none',
+      sameSite: 'strict',
       expires: refreshTokenExpiresAt,
     });
     reply.status(200).send({
