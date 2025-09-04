@@ -35,9 +35,10 @@ export default class OAuthController {
     const { accessToken, refreshToken, refreshTokenExpiresAt } = await service.handleCallback(body);
 
     reply.setCookie('refreshToken', refreshToken, {
+      path: '/api/v1/auth',
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
       expires: refreshTokenExpiresAt,
     });
 
