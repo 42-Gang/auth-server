@@ -5,7 +5,7 @@ import { STATUS } from '../../common/constants/status.js';
 import { signupInputSchema } from './schemas/signup.schema.js';
 import { loginInputSchema, loginResponseSchema } from './schemas/login.schema.js';
 import { requestVerificationCodeInputSchema } from './schemas/requestVerificationCode.schema.js';
-import { UnAuthorizedException } from '../../common/exceptions/core.error.js';
+import { BadRequestException } from '../../common/exceptions/core.error.js';
 import AuthService from './services/auth.service.js';
 import MailVerificationService from './services/mail-verification.service.js';
 import TokenService from './services/token.service.js';
@@ -71,7 +71,7 @@ export default class AuthController {
   refreshAccessToken = async (request: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = request.cookies.refreshToken;
     if (!refreshToken) {
-      throw new UnAuthorizedException('리프레시 토큰이 존재하지 않습니다.');
+      throw new BadRequestException('리프레시 토큰이 존재하지 않습니다.');
     }
 
     const result = await this.tokenService.refreshAccessToken(refreshToken);
